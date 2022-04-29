@@ -8,16 +8,22 @@ sass:
   style: compressed
 
 collections:
-  resume:
+  - resumefr
+  - resumeen
 # Resume settings
 avatar:                  "true"
 name:                    "Axel Verrier"
-description:                   "Undergraduate student in economics"
 
-resume_header_contact_info:     "Université de Bordeaux • axel.verrier [at] proton.me"
+descriptionfr:          "Etudiant en économie"
+descriptionen:          "Undergraduate student in economics"
+
+contact_info_fr:        "Université de Bordeaux • axel.verrier@proton.me"
+contact_info_en:        "University of Bordeaux • axel.verrier@proton.me"
 display_header_contact_info:    "true"
 
-intro: "<p>Etudiant en économie. Intéressé par l'économie du développement et de la santé, ainsi que par l'analyse de données.</p>"
+intro_fr: "<p>Etudiant en économie. Intéressé par l'économie du développement et de la santé, ainsi que par l'analyse de données.</p>"
+intro_en: "<p>Studying economics. Interested in development economics, health economics and data analysis.</p>"
+
 
 # Resume social links
 # uncomment the options you wish to display, and add your own URL
