@@ -1,6 +1,6 @@
 ---
 show: true
-title: Experience
+title: Formation
 order: 1
 ---
 
