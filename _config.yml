@@ -14,7 +14,7 @@ avatar:                  "true"
 name:                    "Axel Verrier"
 description:                   "Undergraduate student in economics"
 
-resume_header_contact_info:     "Université de Bordeaux • axel.verrier@proton.me"
+resume_header_contact_info:     "Université de Bordeaux • axel.verrier [at] proton.me"
 display_header_contact_info:    "true"
 
 intro: "<p>Etudiant en économie. Intéressé par l'économie du développement et de la santé, ainsi que par l'analyse de données.</p>"
