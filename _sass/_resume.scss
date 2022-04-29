@@ -1,4 +1,20 @@
 // Resume styles
+
+.english{
+	display: none;
+}
+
+button{
+	float: right;
+	border: none;
+	background:none;
+	padding: 2%;
+}
+
+#translate{
+	// max-width: 70%;
+	// height: auto;
+}
 // ---------------------------------------/
 
 // util
@@ -230,9 +246,5 @@
         font-size: 11px;
       }
     }
-  }
-  
-  #id{
-  font-size: 20%;
   }
 }
