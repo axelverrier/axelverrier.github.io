@@ -1,6 +1,6 @@
 ---
 show: true
-title: Education
+title: Formation
 order: 2
 ---
 
