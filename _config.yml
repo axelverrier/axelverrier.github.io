@@ -1,0 +1,37 @@
+# Site settings
+title: "Axel Verrier Resume"
+
+# Build settings
+markdown: kramdown
+sass:
+  sass_dir: _sass
+  style: compressed
+
+collections:
+  resume:
+# Resume settings
+avatar:                  "true"
+name:                    "Axel Verrier"
+description:                   "Undergraduate student in economics"
+
+resume_header_contact_info:     "Université de Bordeaux • axel.verrier@proton.me"
+display_header_contact_info:    "true"
+
+intro: "<p>Etudiant en économie. Intéressé par l'économie du développement et de la santé, ainsi que par l'analyse de données.</p>"
+
+# Resume social links
+# uncomment the options you wish to display, and add your own URL
+resume_social_links:
+  resume_github_url:            "https://github.com/axelverrier"
+  # resume_twitter_url:           "http://twitter.com/jglovier"
+  # resume_dribbble_url:          "https://dribbble.com/jag"
+  # resume_facebook_url:          "insert Facebook URL here"
+  resume_linkedin_url:          "https://www.linkedin.com/in/axel-verrier-8029141bb/"
+  # resume_instagram_url:         "insert your Instagram URL here"
+  resume_website_url:           "https://axelverrier.github.io"
+  # resume_medium_url:            "https://medium.com/@jglovier"
+print_social_links:      true
+
+# Note: when editing locally, remember to restart
+# your Jekyll server when you edit this file. Changes
+# to _config.yml are only recognized when the server starts
