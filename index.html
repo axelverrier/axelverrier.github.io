@@ -6,10 +6,10 @@
   {% include head.html %}
 
   <body>
-	<button class="no-print"><img src="images/translation.png" id="translate"></button>
+	
     <div class="wrapper french">
-
-      <header class="page-header">
+	<button class="no-print"><img src="images/translation.png" class="translate"></button>
+	<header class="page-header">
 
         <!-- You can turn off the avatar in _config.yml by setting to false -->
         {% if site.avatar == 'true' %}
@@ -39,7 +39,7 @@
           {{ site.intro_fr }}
         </div>
 
-	  </header>
+	</header>
 		
 		<section class="content-section">
 		{% assign ord = site.resumefr | sort:"order" %}
@@ -58,8 +58,8 @@
     </div>
 
     <div class="wrapper english">
-
-      <header class="page-header">
+	<button class="no-print"><img src="images/translation.png" class="translate"></button>
+	<header class="page-header">
 
         <!-- You can turn off the avatar in _config.yml by setting to false -->
         {% if site.avatar == 'true' %}
@@ -89,7 +89,7 @@
           {{ site.intro_en }}
         </div>
 
-	  </header>
+	</header>
 		<section class="content-section">
 		{% assign ord = site.resumeen | sort:"order" %}
 		{% for element in ord %}
