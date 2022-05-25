@@ -1,12 +1,18 @@
 # Referencement
+plugins:
+  - jekyll-seo-tag
+title: "Axel Verrier Resume"
+tagline: A nice resume
 description: The resume of Axel Verrier, currently studying economics from Bordeaux, France.
 url: axelverrier.github.io
 author: Axel Verrier
-
-plugins:
-  - jekyll-seo-tag
-# Site settings
-title: "Axel Verrier Resume"
+logo: /images/avatar.jpg
+social:
+  name: Axel Verrier
+  links:
+    - https://www.linkedin.com/in/axel-verrier-8029141bb/
+    - https://github.com/axelverrier
+google_site_verification 
 
 # Build settings
 markdown: kramdown
