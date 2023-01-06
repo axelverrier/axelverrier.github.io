@@ -10,6 +10,7 @@ Parcours « Evaluation des politiques publiques et économie du développement �
 Cours suivis : Économétrie, Development Economics, Health Economics and Policy, Fiscal Microsimulation   
 
 **Master Économie du développement • 2022-2024 • Université de Bordeaux**
+
 **Semestre à Florence • 2022 • Università degli Studi di Firenze**
 - Development microeconomics, *Prof A. Cigno*
 - Human rights and armed conflicts, *Prof A. Bultrini*
