@@ -12,10 +12,9 @@ logo: /images/avatar.jpg
 social:
   name: Axel Verrier
   links:
-    - https://www.linkedin.com/in/axel-verrier-8029141bb/
+    - https://www.linkedin.com/in/axel-verrier/
     - https://github.com/axelverrier
-google_site_verification 
-locale
+
 
 # Build settings
 markdown: kramdown
