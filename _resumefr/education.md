@@ -15,7 +15,9 @@ Cours suivis : Économétrie, Development Economics, Health Economics and Policy
 - Human rights and armed conflicts, *Prof A. Bultrini*
 - Labour market and gender, *Prof. C. Giannelli*
 - Mathematical methods for economic analysis, *Prof C. Domenico*
-- Human development and International Cooperation, *Prof M. Biggeri* 
+- Human development and International Cooperation, *Prof M. Biggeri*
+
+
 **L3 Stratégies, décisions et politiques économiques • 2021 • Université de Bordeaux**  
 
 ## Classe Préparatoire aux Grandes Ecoles B/L • 2019-2021
