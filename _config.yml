@@ -32,8 +32,8 @@ name:                    "Axel Verrier"
 descriptionfr:          "Etudiant en économie"
 descriptionen:          "Undergraduate student in economics"
 
-contact_info_fr:        "Université de Bordeaux • axel.verrier@proton.me"
-contact_info_en:        "University of Bordeaux • axel.verrier@proton.me"
+contact_info_fr:        "Université de Bordeaux • axel.verrier7@gmail.com"
+contact_info_en:        "University of Bordeaux • axel.verrier7@gmail.com"
 display_header_contact_info:    "true"
 
 intro_fr: "<p>Etudiant en économie. Intéressé par l'économie du développement et de la santé, ainsi que par l'analyse de données.</p>"
@@ -44,13 +44,13 @@ intro_en: "<p>Studying economics. Interested in development economics, health ec
 # uncomment the options you wish to display, and add your own URL
 resume_social_links:
   resume_github_url:            "https://github.com/axelverrier"
-  # resume_twitter_url:           "http://twitter.com/jglovier"
-  # resume_dribbble_url:          "https://dribbble.com/jag"
+  # resume_twitter_url:           
+  # resume_dribbble_url:          
   # resume_facebook_url:          "insert Facebook URL here"
-  resume_linkedin_url:          "https://www.linkedin.com/in/axel-verrier-8029141bb/"
+  resume_linkedin_url:          "https://www.linkedin.com/in/axel-verrier"
   # resume_instagram_url:         "insert your Instagram URL here"
   resume_website_url:           "https://axelverrier.github.io"
-  # resume_medium_url:            "https://medium.com/@jglovier"
+  # resume_medium_url:            
 print_social_links:      true
 
 # Note: when editing locally, remember to restart
