@@ -1,0 +1,11 @@
+h2 {
+  font-family: "Times New Roman", serif;
+  margin-bottom: 0px;
+
+}
+
+div.quarto-about-trestles .about-entity .about-links {
+  column-gap: 1em;
+  margin-right: 20%;
+  margin-left: 20%;
+}
