@@ -1,0 +1,70 @@
+---
+#title: "About me"
+image: profile.gif
+about:
+  id: hero-heading
+  template: jolla
+  image: profile.gif
+  links:
+    - icon: linkedin
+      text: Linkedin
+      href: https://linkedin.com/axelverrier
+    - icon: github
+      text: Github
+      href: https://github.com/axelverrier
+---
+
+::: {#hero-heading}
+:::
+
+## Hi!
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut viverra consequat purus nec maximus. Donec sit amet nibh leo. Quisque venenatis convallis neque consectetur tempus. Aliquam vehicula lorem ut urna rhoncus, vitae posuere mauris scelerisque. Sed ac pulvinar mauris, et consectetur risus. Mauris scelerisque, metus vitae feugiat ullamcorper, ligula nisi porta sapien, eu consequat lorem nisl eget quam. Etiam consectetur, magna nec accumsan dapibus, libero arcu gravida libero, a ornare est enim vitae nunc. Cras eleifend posuere velit vitae mollis. Aenean aliquam neque a enim finibus vehicula. Quisque iaculis dictum nibh volutpat consectetur. Sed augue velit, bibendum eu elit a, interdum euismod leo.
+
+::: grid
+::: g-col-7
+## Experience
+
+**2024 ∙ OECD ∙ Intern**\
+I am an intern at OECD in the Environment Directorate, more specifically in the team studying interlinkages between innovation and environment. I work primarily on critical raw materials, but also on mapping the twin transition.\
+I have experience working with EPO database PATSTAT. I also took advantage of my time there to follow [Nelson Amaya's workshop on R](https://r4dev.netlify.app/), and you can find some of my work from this course [here](/projects/2024-oecd-r-workshop.qmd).\
+\
+
+**2023 ∙ University of Bordeaux ∙ Research Assistant for Prof. Delphine Boutin**\
+
+-   Developed R script for text analysis
+
+\
+**2023 ∙ French Ministry of Higher Education and Research ∙ Statistician (intern)**\
+
+-   Managed a national survey from launch to the publication of results (*Enquête Ecole doctorale*)\
+-   Oversaw data collection process\
+-   Cleaned and analyzed quantitative data\
+-   Developed automated process for data management\
+-   Produced extensive descriptive statistics\
+-   Translated SAS code to R
+
+\
+**Summer 2022 ∙ INSERM/ISPED ∙ Research assistant for Prof. Jérôme Wittwer**\
+
+-   Contributed to economic evaluation (micro-costing) of a cancer treatment.\
+-   Analyzed quantitative survey data
+:::
+
+::: g-col-5
+## Education
+
+**University of Bordeaux, France**\
+![](/icons/icon-graduate.png) MSc in Economics, specialization in analysis of public policies ∙ 2022-2024\
+![](/icons/icon-graduate.png) Magistère de Sciences Economiques, parcours [MAGEVAL](https://magistere.economie.u-bordeaux.fr/le-mageval/) ∙ University of Bordeaux ∙ 2021-2024\
+
+**University of Florence, Italy**\
+![](/icons/plane.png) Semester abroad ∙ 2022\
+\
+\
+
+## CS skills
+
+![](/icons/rstudio.png){width="30%"} ![](/icons/stata.png){width="30%"} ![](/icons/python.png){width="30%"}
+:::
+:::

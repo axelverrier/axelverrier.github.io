@@ -1,0 +1,47 @@
+project:
+  type: website
+
+website:
+  favicon: favicon.png
+  title: "Axel Verrier"
+  
+  page-footer: "Copyright 2024, Axel Verrier. Icons by [icons8](https://www.icons8.com)" 
+  
+  back-to-top-navigation: true
+  #reader-mode: true
+  
+  repo-url: https://github.com/axelverrier/website
+  repo-actions: [issue]
+  
+  navbar:
+    search: true
+    #logo: logo.jpg
+    left:
+      - href: index.qmd
+        text: "Home"
+      - href: about.qmd
+        text: "About me"
+      - href: posts.qmd
+        text: "Blog posts"
+      - href: projects.qmd
+        text: "Projects"
+        # menu:
+        #   - href: projects/2024-oecd-r-workshop/index-workshop.qmd
+        #     text: "OECD workshop on R"
+
+    tools:
+      - icon: linkedin
+        href: https://www.linkedin.com/in/axel-verrier/
+      - icon: github
+        href: https://github.com/axelverrier/ 
+
+
+format:
+  html:
+    theme:
+      light: flatly
+      dark: darkly
+    css: styles.css
+    toc: false
+    page-layout: full
+
