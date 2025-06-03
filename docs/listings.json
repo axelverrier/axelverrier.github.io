@@ -2,6 +2,7 @@
   {
     "listing": "/projects.html",
     "items": [
+      "/projects/snippets.html",
       "/projects/2024-oecd-r-workshop.html"
     ]
   },
@@ -12,6 +13,14 @@
       "/projects/2024-oecd-r-workshop/04_animation.html",
       "/projects/2024-oecd-r-workshop/03_text.html",
       "/projects/2024-oecd-r-workshop/02_plots.html"
+    ]
+  },
+  {
+    "listing": "/projects/snippets.html",
+    "items": [
+      "/projects/snippets/wrangling.html",
+      "/projects/snippets/econometrics.html",
+      "/projects/snippets/statistics.html"
     ]
   }
 ]
