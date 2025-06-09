@@ -157,8 +157,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </section>
-<section id="continuous-outcome" class="level2 tabset">
-<h2 class="tabset anchored" data-anchor-id="continuous-outcome">Continuous outcome</h2>
+<section id="continuous-outcome" class="level2">
+<h2 class="anchored" data-anchor-id="continuous-outcome">Continuous outcome</h2>
 <div class="tabset-margin-container"></div><div class="panel-tabset">
 <ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-2-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-1" role="tab" aria-controls="tabset-2-1" aria-selected="true">R</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-2" role="tab" aria-controls="tabset-2-2" aria-selected="false">Python</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-3" role="tab" aria-controls="tabset-2-3" aria-selected="false">Stata</a></li></ul>
 <div class="tab-content">
@@ -279,9 +279,25 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>Tests of relevance (weakness of the instrument)</p>
 <ul>
 <li>For a single instrument, use Stock and Staiger (1997)’s informal rule of thumb: the first-stage F-statistic for the instrument should be &gt; 10</li>
-<li>For multiple instruments, compare the Cragg-Donald Wald F statistic (= joint relevance of the instruments) to the critical values of Stock-Yogo (2005). This measures the bias with OLS. :::{.warning} Comparing the Cragg-Donald Wald F to the Stock-Yogo critical values is only valid for for i.i.d. errors and homoskedasticity. In case of heteroskedasticity or clustering, use the Kleibergen-Paap rk Wald F statistics instead. :::</li>
+<li>For multiple instruments, compare the Cragg-Donald Wald F statistic (= joint relevance of the instruments) to the critical values of Stock-Yogo (2005). This measures the bias with OLS.</li>
 </ul>
-<p>::: {.panel-tabset} ### R</p>
+<div class="callout callout-style-default callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Warning
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Comparing the Cragg-Donald Wald F to the Stock-Yogo critical values is only valid for for i.i.d. errors and homoskedasticity. In case of heteroskedasticity or clustering, use the Kleibergen-Paap rk Wald F statistics instead.</p>
+</div>
+</div>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-3-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-1" role="tab" aria-controls="tabset-3-1" aria-selected="true">R</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-3-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-2" role="tab" aria-controls="tabset-3-2" aria-selected="false">Python</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-3-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-3" role="tab" aria-controls="tabset-3-3" aria-selected="false">Stata</a></li></ul>
+<div class="tab-content">
+<div id="tabset-3-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-3-1-tab">
 <div class="sourceCode" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ivmodel)</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(card.data)</span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -305,7 +321,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb10-21"><a href="#cb10-21" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(iv_est, <span class="at">stage =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <section id="testing-for-the-relevance-of-the-instrument-weakness" class="level4">
 <h4 class="anchored" data-anchor-id="testing-for-the-relevance-of-the-instrument-weakness">Testing for the relevance of the instrument / weakness</h4>
-<div class="sourceCode" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="sc">*</span> Stock and Saiger rule of <span class="fu">thumb</span> (<span class="dv">1997</span>)</span>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Stock and Saiger rule of thumb (1997)</span></span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>stage1 <span class="ot">&lt;-</span> <span class="fu">lm</span>(educ <span class="sc">~</span> nearc4, <span class="at">data =</span> card.data)</span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(stage1)  </span>
 <span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a></span>
@@ -314,12 +330,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a><span class="co">#for ivreg, felm and feols, F-stat is displayed using summary</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
-<section id="python-1" class="level3">
-<h3 class="anchored" data-anchor-id="python-1">Python</h3>
+</div>
+<div id="tabset-3-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-3-2-tab">
 <div class="sourceCode" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</section>
-<section id="stata-1" class="level3">
-<h3 class="anchored" data-anchor-id="stata-1">Stata</h3>
+</div>
+<div id="tabset-3-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-3-3-tab">
 <p>Data available <a href="https://www.stata.com/data/jwooldridge/eacsap/card.dta">[here]</a></p>
 <div class="sourceCode" id="cb13"><pre class="sourceCode stata code-with-copy"><code class="sourceCode stata"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>* Manually</span>
@@ -353,10 +368,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>ivreg2 lwage (educ = nearc4 fatheduc) <span class="ot">$controls</span></span>
 <span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>* ivreg2 automatically <span class="kw">report</span> Kleibergen-Paap rk Wald <span class="fu">F</span> <span class="kw">if</span> <span class="kw">robust</span>, <span class="kw">cluster</span> <span class="kw">or</span> bw is used. </span>
 <span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+</div>
+</div>
+</div>
 
 
-</section>
-</section>
 </section>
 </section>
 
