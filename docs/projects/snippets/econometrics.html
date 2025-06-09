@@ -273,8 +273,90 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
+</section>
+<section id="instrumental-variables" class="level2 tabset">
+<h2 class="tabset anchored" data-anchor-id="instrumental-variables">Instrumental variables</h2>
+<p>Tests of relevance (weakness of the instrument)</p>
+<ul>
+<li>For a single instrument, use Stock and Staiger (1997)’s informal rule of thumb: the first-stage F-statistic for the instrument should be &gt; 10</li>
+<li>For multiple instruments, compare the Cragg-Donald Wald F statistic (= joint relevance of the instruments) to the critical values of Stock-Yogo (2005). This measures the bias with OLS. :::{.warning} Comparing the Cragg-Donald Wald F to the Stock-Yogo critical values is only valid for for i.i.d. errors and homoskedasticity. In case of heteroskedasticity or clustering, use the Kleibergen-Paap rk Wald F statistics instead. :::</li>
+</ul>
+<p>::: {.panel-tabset} ### R</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ivmodel)</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(card.data)</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Manually</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>stage1 <span class="ot">&lt;-</span> <span class="fu">lm</span>(educ <span class="sc">~</span> nearc4 <span class="sc">+</span>IQ <span class="sc">+</span> married <span class="sc">+</span> black <span class="sc">+</span> smsa <span class="sc">+</span> exper, <span class="at">data =</span> card.data)</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>x_hat <span class="ot">&lt;-</span> <span class="fu">predict</span>(stage1, <span class="at">newdata =</span> card.data)</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>stage2 <span class="ot">&lt;-</span> <span class="fu">lm</span>(lwage <span class="sc">~</span> x_hat <span class="sc">+</span>IQ <span class="sc">+</span> married <span class="sc">+</span> black <span class="sc">+</span> smsa <span class="sc">+</span> exper, <span class="at">data =</span> card.data)</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(stage2)</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a><span class="co">#using AER::ivreg</span></span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>iv_est <span class="ot">&lt;-</span> AER<span class="sc">::</span><span class="fu">ivreg</span>(lwage <span class="sc">~</span> educ <span class="sc">+</span> IQ <span class="sc">+</span> married <span class="sc">+</span> black <span class="sc">+</span> smsa <span class="sc">+</span> exper <span class="sc">|</span> nearc4 <span class="sc">+</span> IQ <span class="sc">+</span> married <span class="sc">+</span> black <span class="sc">+</span> smsa <span class="sc">+</span> exper, <span class="at">data =</span> card.data)</span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(iv_est, <span class="at">diagnostics =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a><span class="co">#using lfe::felm</span></span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>iv_est <span class="ot">&lt;-</span> lfe<span class="sc">::</span><span class="fu">felm</span>(lwage <span class="sc">~</span> IQ <span class="sc">+</span> married <span class="sc">+</span> black <span class="sc">+</span> smsa <span class="sc">+</span> exper <span class="sc">|</span> <span class="dv">0</span> <span class="sc">|</span> (educ <span class="sc">~</span> nearc4) <span class="sc">|</span> <span class="dv">0</span>, <span class="at">data =</span> card.data)</span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(iv_est)</span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(iv_est<span class="sc">$</span>stage1)</span>
+<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a><span class="co">#using fixest::feols</span></span>
+<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a>iv_est <span class="ot">&lt;-</span> fixest<span class="sc">::</span><span class="fu">feols</span>(lwage <span class="sc">~</span> IQ <span class="sc">+</span> married <span class="sc">+</span> black <span class="sc">+</span> smsa <span class="sc">+</span> exper <span class="sc">|</span> educ <span class="sc">~</span> nearc4, <span class="at">data =</span> card.data)</span>
+<span id="cb10-21"><a href="#cb10-21" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(iv_est, <span class="at">stage =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<section id="testing-for-the-relevance-of-the-instrument-weakness" class="level4">
+<h4 class="anchored" data-anchor-id="testing-for-the-relevance-of-the-instrument-weakness">Testing for the relevance of the instrument / weakness</h4>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="sc">*</span> Stock and Saiger rule of <span class="fu">thumb</span> (<span class="dv">1997</span>)</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>stage1 <span class="ot">&lt;-</span> <span class="fu">lm</span>(educ <span class="sc">~</span> nearc4, <span class="at">data =</span> card.data)</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(stage1)  </span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>stage1 <span class="ot">&lt;-</span> <span class="fu">lm</span>(educ <span class="sc">~</span> nearc4 <span class="sc">+</span> IQ <span class="sc">+</span> married <span class="sc">+</span> black <span class="sc">+</span> smsa <span class="sc">+</span> exper, <span class="at">data =</span> card.data)</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>car<span class="sc">::</span><span class="fu">linearHypothesis</span>(stage1, <span class="st">"nearc4 = 0"</span>) <span class="sc">/</span><span class="er">/</span> to compute the partial F<span class="sc">-</span>stat, <span class="cf">in</span> the case of controls</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a><span class="co">#for ivreg, felm and feols, F-stat is displayed using summary</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="python-1" class="level3">
+<h3 class="anchored" data-anchor-id="python-1">Python</h3>
+<div class="sourceCode" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="stata-1" class="level3">
+<h3 class="anchored" data-anchor-id="stata-1">Stata</h3>
+<p>Data available <a href="https://www.stata.com/data/jwooldridge/eacsap/card.dta">[here]</a></p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode stata code-with-copy"><code class="sourceCode stata"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>* Manually</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="kw">reg</span> educ nearc4 <span class="ot">$controls</span> <span class="co">// regress X on Z</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="kw">predict</span> x_hat <span class="co">// Compute X_hat </span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="kw">reg</span> lwage x_hat <span class="ot">$controls</span> <span class="co">// regress Y on X_hat</span></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>* Using the ivregress command</span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>ivregress 2sls lwage (educ=nearc4) <span class="ot">$controls</span></span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a><span class="co">//Display first stage</span></span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>ivregress 2sls lwage (educ=nearc4) <span class="ot">$controls</span> , first </span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>*<span class="kw">using</span> ivreg2 </span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a><span class="kw">ssc</span> install ivreg2</span>
+<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a><span class="kw">ssc</span> install ranktest</span>
+<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a>ivreg2 lwage (educ = nearc4) <span class="ot">$controls</span></span>
+<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<section id="testing-for-the-relevance-of-the-instrument-weakness-1" class="level4">
+<h4 class="anchored" data-anchor-id="testing-for-the-relevance-of-the-instrument-weakness-1">Testing for the relevance of the instrument / weakness</h4>
+<div class="sourceCode" id="cb14"><pre class="sourceCode stata code-with-copy"><code class="sourceCode stata"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>* Stock and Saiger rule <span class="kw">of</span> thumb (1997)</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="kw">reg</span> educ nearc4 <span class="ot">$controls</span> </span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="kw">test</span> nearc4 </span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="co">//Note: automatically computes the partial F statistics if controls</span></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>*Stock-Yogo (2005) critical <span class="kw">values</span></span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>ivreg2 lwage (educ = nearc4 fatheduc) <span class="ot">$controls</span></span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>* ivreg2 automatically <span class="kw">report</span> Kleibergen-Paap rk Wald <span class="fu">F</span> <span class="kw">if</span> <span class="kw">robust</span>, <span class="kw">cluster</span> <span class="kw">or</span> bw is used. </span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 
 
+</section>
+</section>
 </section>
 </section>
 
