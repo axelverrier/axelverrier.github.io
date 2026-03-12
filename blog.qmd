@@ -1,0 +1,11 @@
+---
+title: "Blog"
+draft: true
+listing:
+  contents: posts
+  type: table
+  fields: [date, title, description]
+  sort: "date desc"
+  filter-ui: false
+  sort-ui: false
+---

@@ -1,0 +1,267 @@
+---
+title: "Econometrics"
+#date: 06-03-2025
+description: ""
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, cache = TRUE, eval = FALSE)
+
+```
+
+# Regressions
+
+## Binary outcome
+::: {.panel-tabset}
+### R
+```{.r}
+# set y as factor
+y <- factor(y, levels = c(0, 1), labels = c("zero", "one"))
+
+#logit
+logit <- glm(y ~ d + X, data = mydata, family = binomial(link = "logit"))
+summary(logit)
+
+#probit
+probit <- glm(y ~ d + X, data = mydata, family = binomial(link = "probit"))
+summary(probit)
+```
+
+add margins and how to compute marginal effects here
+:::
+
+
+
+## Continuous outcome
+::: {.panel-tabset}
+### R
+I use base R, `fixest::feols()` and `lfe:felm()`.
+
+```{.r}
+# Use base::mtcars data
+ols <- lm(mpg ~ wt + ., data = mtcars)
+summary(ols)
+```
+
+Adding FE
+```{.r}
+library(stargazer)
+library(lfe)
+library(fixest)
+
+data(mtcars)
+mtcars <- mtcars %>% mutate(year=rep(seq(2000,2003),8)) #add years to the data
+
+reg1 <- lm(mpg ~ wt + as.factor(year), mtcars)
+reg2 <- lfe::felm(mpg ~ wt|year|0|0, mtcars)
+reg3 <- fixest::feols(mpg ~ wt | year, data = mtcars)
+
+#compare; all those methods are equivalent
+stargazer::stargazer(reg1, reg2, type = 'text', keep = "wt")
+summary(reg3, se = "standard") 
+#Note: feols is not supported by stargazer :/ 
+
+```
+
+Correcting for heteroskedasticity (robust SE)
+```{.r}
+library(lmtest)
+library(sandwich)
+library(lfe)
+library(fixest)
+
+
+#load data
+data(mtcars)
+
+# All those methods are equivalent
+reg1 <- lm(mpg ~ wt, mtcars)
+reg1 <- coeftest(reg1, vcov. = vcovHC(reg1, type = "HC1"))
+summary(reg1)
+
+reg2 <- lfe::felm(mpg ~ wt|0|0|0, mtcars)
+summary(reg2, robust=TRUE)
+
+reg3 <- fixest::feols(mpg ~ wt, data=mtcars, vcov = 'HC1')
+summary(reg3)
+
+
+# options for type={const, HC0, ..., HC5}
+# const for constant variance (usual estimates)
+# HC0 is White's estimator
+# HC3 is the default as recommended per Long & Ervin (2000)
+# more recent research suggest using HC4m (small sample) or HC5
+```
+
+Clustering SE
+```{.r}
+library(lmtest)
+library(sandwich)
+library(lfe)
+library(fixest)
+
+data(mtcars)
+mtcars <- mtcars %>% mutate(year=rep(seq(2000,2003),8)) #add years to the data
+
+#cluster SE by year; all those methods are equivalent
+reg1 <- lm(mpg ~ wt, mtcars)
+reg1 <- coeftest(reg1, vcov. = vcovCL(reg1, cluster=~year))
+print(reg1)
+
+reg2 <- lfe::felm(mpg ~ wt|0|0|year, mtcars)
+summary(reg2)
+
+reg3 <- fixest::feols(mpg ~ wt , data = mtcars, cluster = "year")
+summary(reg3)
+
+
+```
+
+### Python
+```{.python}
+# USING STATS MODEL
+import statsmodels.api as sm
+import numpy as np
+import pandas as pd
+
+mtcars = sm.datasets.get_rdataset('mtcars')
+mtcars = pd.DataFrame(mtcars.data)
+
+#first specify formula
+X = [col for col in mtcars.columns if col not in ['mpg', 'wt']]
+formula = 'mpg ~ wt + ' + ' + '.join(X)
+model = sm.formula.ols(formula, mtcars)
+
+#fit the model
+model = model.fit()
+print(model.summary())
+
+#when specifying the formula and then fitting, there is no need to add a constant, however when using sm.OLS, you do. 
+X = mtcars.drop(columns=["mpg"])
+X = sm.add_constant(X)  # Adds intercept term (column of 1s)
+y = mtcars['mpg']
+model = sm.OLS(y, X).fit()
+print(model.summary())
+```
+
+Correcting for heteroskedasticity (robust se)
+```{python}
+robust_results = model.get_robustcov_results(cov_type='HC3')
+print(robust_results.summary())
+```
+
+Clustered se (account for correlation within groups)
+```{python}
+robust_results = model.get_robustcov_results(cov_type='cluster', groups=mtcars['gear'])
+print(robust_results.summary())
+```
+
+### Stata
+```{.stata}
+reg y x1 x2
+reg y x1 x2, robust
+reg y x1 x2, vce(cluster groupvar)
+
+```
+:::
+
+
+
+## Instrumental variables  {.tabset}
+
+  Tests of relevance (weakness of the instrument)
+
+- For a single instrument, use Stock and Staiger (1997)'s informal rule of thumb: the first-stage F-statistic for the instrument should be > 10
+- For multiple instruments, compare the Cragg-Donald Wald F statistic (= joint relevance of the instruments) to the critical values of Stock-Yogo (2005). This measures the bias with OLS.
+
+:::{.callout-warning}
+Comparing the Cragg-Donald Wald F to the Stock-Yogo critical values is only valid for for i.i.d. errors and homoskedasticity. In case of heteroskedasticity or clustering, use the Kleibergen-Paap rk Wald F statistics instead. 
+:::
+
+
+::: {.panel-tabset}
+### R
+
+```{.r}
+library(ivmodel)
+data(card.data)
+
+# Manually
+stage1 <- lm(educ ~ nearc4 +IQ + married + black + smsa + exper, data = card.data)
+x_hat <- predict(stage1, newdata = card.data)
+stage2 <- lm(lwage ~ x_hat +IQ + married + black + smsa + exper, data = card.data)
+summary(stage2)
+
+#using AER::ivreg
+iv_est <- AER::ivreg(lwage ~ educ + IQ + married + black + smsa + exper | nearc4 + IQ + married + black + smsa + exper, data = card.data)
+summary(iv_est, diagnostics = TRUE)
+
+#using lfe::felm
+iv_est <- lfe::felm(lwage ~ IQ + married + black + smsa + exper | 0 | (educ ~ nearc4) | 0, data = card.data)
+summary(iv_est)
+summary(iv_est$stage1)
+
+#using fixest::feols
+iv_est <- fixest::feols(lwage ~ IQ + married + black + smsa + exper | educ ~ nearc4, data = card.data)
+summary(iv_est, stage = 1:2)
+```
+
+#### Testing for the relevance of the instrument / weakness
+```{.r}
+# Stock and Saiger rule of thumb (1997)
+stage1 <- lm(educ ~ nearc4, data = card.data)
+summary(stage1)  
+
+stage1 <- lm(educ ~ nearc4 + IQ + married + black + smsa + exper, data = card.data)
+car::linearHypothesis(stage1, "nearc4 = 0") // to compute the partial F-stat, in the case of controls
+
+#for ivreg, felm and feols, F-stat is displayed using summary
+```
+
+### Python
+
+```{.python}
+```
+
+### Stata
+Data available [\[here\]](https://www.stata.com/data/jwooldridge/eacsap/card.dta)
+```{.stata}
+
+* Manually
+reg educ nearc4 $controls // regress X on Z
+predict x_hat // Compute X_hat 
+reg lwage x_hat $controls // regress Y on X_hat
+
+
+
+* Using the ivregress command
+ivregress 2sls lwage (educ=nearc4) $controls
+
+//Display first stage
+ivregress 2sls lwage (educ=nearc4) $controls , first 
+
+*using ivreg2 
+ssc install ivreg2
+ssc install ranktest
+ivreg2 lwage (educ = nearc4) $controls
+
+
+```
+
+
+#### Testing for the relevance of the instrument / weakness
+```{.stata}
+
+* Stock and Saiger rule of thumb (1997)
+reg educ nearc4 $controls 
+test nearc4 
+//Note: automatically computes the partial F statistics if controls
+
+
+*Stock-Yogo (2005) critical values
+ivreg2 lwage (educ = nearc4 fatheduc) $controls
+* ivreg2 automatically report Kleibergen-Paap rk Wald F if robust, cluster or bw is used. 
+
+
+```
+:::

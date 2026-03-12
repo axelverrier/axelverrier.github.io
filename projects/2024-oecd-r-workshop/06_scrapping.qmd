@@ -1,0 +1,187 @@
+---
+title: "Web scrapping"
+description: "Using web scrapping techniques to gather data from the web"
+date: 05-04-2024
+---
+
+Let's start by installing the required dependencies.
+
+```{r message=FALSE, warning=FALSE}
+#| label: Loading packages
+library(tidyverse)
+library(rvest)
+library(rlang)
+library(reactable)
+```
+
+# 1. Get a list of someone's papers from Google scholar
+
+Since there is no API, we define a function to retrieve any author's ID.
+
+```{r}
+#| label: Creating function to retrieve author's id
+#| code-fold: show
+get_author_id <- function(name){
+  # add some warnings
+  if(typeof(name)!="character"){stop("Please enter a character vector")}
+  
+  url <- paste0("https://scholar.google.com/citations?view_op=search_authors&mauthors=", paste(gsub(" ", "+", trimws(name)), sep="+"))
+  
+  id <- rvest::read_html(url) %>%
+    rvest::html_elements(".gs_ai_name a") %>%
+    rvest::html_attr("href") %>%
+    stringr::str_extract("user=([^&]+)")%>% #extract id using some regex 
+    str_replace("user=", "") %>% #clean the string
+    first()
+  
+  #yet another warning
+  if(rlang::is_empty(id) | is.na(id)){
+    stop("No author was found")
+  }else{
+    return(id)
+  }
+}
+```
+
+Now we define a function to scrap 20 of the papers from this author.
+
+```{r}
+#| label: Function to retrieve the author's papers
+#| code-fold: show
+get_author_papers <- function(name, by=c("recent", "citations")){
+  url <- paste0("https://scholar.google.com/citations?hl=fr&user=", get_author_id(name), "&view_op=list_works")
+  
+  #add an option for selecting paper based on recent or number of citation
+  if(by=="recent"){url <- paste0(url, "&sortby=pubdate")}
+  
+  title <- url %>% 
+    rvest::read_html() %>%
+    rvest::html_elements(".gsc_a_at")%>%
+    rvest::html_text() %>%
+    tibble::as_tibble() %>%
+    rename(title=value)
+  
+  year <- url %>% 
+    rvest::read_html() %>%
+    rvest::html_elements(".gsc_a_hc")%>%
+    rvest::html_text() %>%
+    tibble::as_tibble() %>%
+    rename(year=value)
+  
+  #We need to do a bit of cleaning to remove the author's name from coauthors.
+  #the strategy is the following: find the name of the author in the string and remove anything between the two commas where the name is.
+  
+  surname <- str_split(name, " ") %>% unlist() 
+  surname <- surname[[length(surname)]]
+  coauth <- 
+    url %>% 
+    rvest::read_html() %>%
+    rvest::html_elements(".gsc_a_at+ .gs_gray")%>%
+    rvest::html_text() %>% 
+    #remove the part of the string containing the last name of the author 
+    #and everything before and after in between commas
+    str_replace(paste0("(?i)(?<=,|^)[^,]*", surname, "[^,]*(?=,|$)"), "") %>%
+    #remove leading or trailing commas
+    str_replace("^[,\\s]+|[,\\s]+$", "")%>%
+    #replace two commas following each other by only one
+    str_replace(",,", ",")%>% 
+    tibble::as_tibble() %>%
+    rename(coauth=value) 
+  
+  return(tibble(title, year, coauth))
+}
+```
+
+::: {.callout-caution collapse="true"}
+A small drawback of my method to get rid of the author's name among coauthors is that if two persons with the same last name publish a paper together (eg: a couple), then one of them will be removed (first occurrence of the last name). Although this can be a problem, it is unlikely to happen very often, and I have no other solution to offer as I cannot perform matching on the whole author's name, as first and middle names are usually abbreviated in different ways.
+:::
+
+Let's display those information for Daron Acemoglu.
+
+```{r}
+#| label: Apply for Daron Acemoglu
+
+get_author_papers("Daron Acemoglu", by="recent") %>%
+  reactable(
+    searchable = TRUE, 
+    striped = TRUE, 
+    resizable = TRUE
+    )
+```
+
+```{r include=FALSE}
+status <- rvest::read_html("https://r4dev.netlify.app/sessions_workshop/06-scrap/06-scrap") %>%
+  rvest::html_elements("#part-ii-beyond-static-websites p")%>%
+  rvest::html_text()
+```
+
+::: callout-note
+## What's next
+
+Hopefully one day I'll learn how to interact with JS components to load more than 20 papers. For this to happen, I need Nelson's blog to be completed. The current status of the workshop is: `{r} print(status)`
+:::
+
+# 2. Scrap Wikipedia data
+
+Load dependencies
+
+```{r include=FALSE}
+#| label: Loading dependencies
+library(tidyverse)
+library(rvest)
+library(sf)
+library(rnaturalearth)
+library(ggthemes)
+library(countrycode)
+```
+
+I've faced so many problems using rvest to try to scrap data from Wikipedia. For most pages, using the Selector gadget doesn't work, I've relied on the developer tools in Chrome and using xpath instead of css selectors...
+
+I start by retrieving data on CO2 emissions on Wikipedia
+
+```{r message=FALSE}
+#| label: Retrieve data
+co2_change <- rvest::read_html("https://en.wikipedia.org/wiki/List_of_countries_by_carbon_dioxide_emissions") %>%
+  html_node(xpath='/html/body/div[2]/div/div[3]/main/div[3]/div[3]/div[1]/table') %>%
+  html_table() %>%
+  select(1,9) %>%
+  rename(country=1, co2=2) %>%
+  mutate(co2=as.numeric(gsub(",|%", "", co2))/100) %>%
+  filter(!row_number() %in% c(1,210:213)) %>%
+  mutate(co2_index=log(co2))
+
+world_sf <- rnaturalearth::ne_download(returnclass = "sf")
+
+```
+
+We now create a map out of it.
+
+```{r warning=FALSE}
+#| label: Create map
+
+co2_change %>%
+  dplyr::mutate(iso3c = countrycode::countrycode(country, "country.name", "iso3c")) |>
+  dplyr::right_join(world_sf |>
+                      dplyr::select(ISO_A3_EH, geometry),
+                    by = c("iso3c" = "ISO_A3_EH")) |>
+  ggplot() +
+  geom_sf(
+    aes(fill = co2_index,
+        geometry = geometry),
+    alpha = 0.5) +
+  ggplot2::scale_fill_gradientn(
+    colours=c("darkgreen", "lightgreen", "yellow", "darkred"),
+    values = scales::rescale(c(-2,0,0.001, 2.5)), 
+    na.value = "white",
+    limits = c(-2, 2.5),
+    oob = scales::oob_squish, 
+    breaks=c(-2,0,2.5),
+    labels=c("-2 (decrease)", "0 (equal)", "2.5 (increase)"),
+    name="Evolution (in log)"
+  )+
+  labs(
+    title = "CO2 Emissions evolution since 1990",
+    caption = "Source: Crippa et al (2023). GHG emissions of all world countries – 2023. Luxembourg: Publications Office of the European Union. Retrieved from Wikipedia. "
+  ) +
+  ggthemes::theme_map()
+```

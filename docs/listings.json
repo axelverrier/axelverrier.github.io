@@ -1,9 +1,17 @@
 [
   {
-    "listing": "/projects.html",
+    "listing": "/projects/snippets.html",
     "items": [
-      "/projects/snippets.html",
-      "/projects/2024-oecd-r-workshop.html"
+      "/projects/snippets/wrangling.html",
+      "/projects/snippets/econometrics.html",
+      "/projects/snippets/statistics.html",
+      "/projects/snippets/text_processing.html"
+    ]
+  },
+  {
+    "listing": "/blog.html",
+    "items": [
+      "/posts/2025-03-01-lorem-ipsum/index.html"
     ]
   },
   {
@@ -16,12 +24,10 @@
     ]
   },
   {
-    "listing": "/projects/snippets.html",
+    "listing": "/projects.html",
     "items": [
-      "/projects/snippets/wrangling.html",
-      "/projects/snippets/econometrics.html",
-      "/projects/snippets/statistics.html",
-      "/projects/snippets/text_processing.html"
+      "/projects/snippets.html",
+      "/projects/2024-oecd-r-workshop.html"
     ]
   }
 ]

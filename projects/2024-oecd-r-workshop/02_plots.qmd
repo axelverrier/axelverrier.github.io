@@ -1,0 +1,268 @@
+---
+title: "Plotting data"
+date: 03-14-2024
+description: "Visualisation using ggplot and interactive graphs."
+---
+
+# Spotify song analysis
+
+Let's first load the packages necessary for the analysis.
+
+```{r message=FALSE, warning=FALSE}
+# Charging dependencies
+library(tidyverse) 
+library(spotifyr) 
+library(ggridges) 
+library(RColorBrewer) 
+library(MetBrewer) 
+library(plotly) 
+library(htmltools) 
+library(ggiraph)
+```
+
+I define my token for accessing the Spotify API (hidden) and create the function for retrieving the artist ID.
+
+```{r include = FALSE}
+# Set Client ID and Client Secret
+Sys.setenv(SPOTIFY_CLIENT_ID = "36a69de60d6b42e284820e2d7bbb13e3")
+Sys.setenv(SPOTIFY_CLIENT_SECRET = "ecfb19e1c69b4e6fb7c286c7f922640d")
+
+spotify_access_token <- get_spotify_access_token()
+
+```
+
+```{r}
+spotify_id <- function(artist_name) {
+  spotifyr::search_spotify(print(artist_name), type = "artist") |>
+    #dplyr::arrange(desc(popularity)) |> #misleading the algorithm
+    dplyr::select(id) |>
+    dplyr::slice(1) |>
+    as.character()
+}
+
+```
+
+Then I define some of my favorite artists in a tibble.
+
+```{r results='hide'}
+favorites <- tribble(
+  ~artist,
+  "Damso",
+  "Dooz Kawa",
+  "Connor Price",
+  "Twenty One Pilots",
+) |>
+  dplyr::rowwise() |>
+  dplyr::mutate(artist_id = spotify_id(artist))
+
+#save in list
+favorites_music <- list() 
+```
+
+Now I retrieve the data using the Spotify API.
+
+```{r results='hide'}
+for(i in favorites$artist_id) {
+  
+  favorites_music[[i]] <- spotifyr::get_artist_audio_features(artist = print(i),
+                                                              include_groups = "album",
+                                                              authorization =  spotify_access_token)
+  
+}
+
+```
+
+Finally here is a graph of the 4 artists.
+
+```{r}
+spotify_covers_gg <- favorites_music %>%
+  purrr::map_df(bind_rows) %>%
+  dplyr::left_join(favorites, by="artist_id") |> 
+  dplyr::mutate(cover = map(album_images, ~.x[[2]][[2]])) |>
+  ggplot(aes(y=energy,x=valence,color=artist_name))+
+  geom_point_interactive(
+    aes(shape = artist_name,
+        tooltip =  paste0(
+          "<div style='display: flex; align-items: center;'>",
+          "<img src='", cover, "' style='width:100px; height:auto; margin-right: 10px;'>",
+          "<div>",
+          "<b>Artist:</b> ", artist_name, "<br>",
+          "<b>Song:</b> ", track_name, "<br>",
+          "<b>Album:</b> ", album_name,
+          "</div>",
+          "</div>"
+        )),  
+    position = "jitter")+
+  geom_hline(yintercept = 0.5)+
+  geom_vline(xintercept = 0.5)+
+  annotate("text", x = 0.2, y = 1, label = "Turbulent/Angry")+
+  annotate("text", x = 0.8, y = 1, label = "Happy/Joyful")+
+  annotate("text", x = 0.2, y = 0.1, label = "Sad/Depressing")+
+  annotate("text", x = 0.8, y = 0.1, label = "Chill/Peaceful")+
+  labs(title = "Energy vs. Valence by artist", 
+       caption = "Source: Spotify data")+
+  MetBrewer::scale_color_met_d(name = "Ingres")+
+  scale_shape_manual(values = c(1:8))+
+  theme_classic()+
+  theme(legend.position = "top",
+        legend.title = element_blank())
+
+girafe(ggobj = spotify_covers_gg)
+```
+
+Most of the music produced by the four artists I chose is high-energy music. Dooz Kawa musics are rather happy and joyful (not so sure about that...) whereas Twenty One Pilots and Damso musics are more turbulent. Connor Price's songs are equally distributed between angry and joyful, which seems correct. Also, apparently, I don't listen to low energy music unless it's depressing...
+
+# Indicator from OWID
+
+Now let's build a nice graph from OWID data. Let'sfocus on CO2 emissions.
+
+```{r message=FALSE, warning=FALSE}
+#Loading dependencies
+library(ggplot2)
+library(dplyr)
+library(plotly)
+library(viridis)
+library(hrbrthemes)
+```
+
+I first download the dataset directly from Github.
+
+```{r message=FALSE, warning=FALSE}
+co2data <- readr::read_csv("https://raw.githubusercontent.com/owid/co2-data/master/owid-co2-data.csv") |>
+  janitor::clean_names() |>
+  dplyr::mutate(continent = countrycode::countrycode(sourcevar = country, origin = "country.name", destination = "continent"))
+```
+
+I then build a nice bubble chart, made interactive with plotly.
+
+```{r}
+p <- co2data |>
+  filter(year=="2018") |> 
+  dplyr::select(country, population, gdp, co2_per_capita, co2, continent) |>
+  dplyr::filter(!is.na(continent), !is.na(gdp)) |>
+  mutate(gdppc=round(gdp/population, 0)) |>
+  arrange(desc(co2_per_capita)) |>
+  mutate(country = factor(country, country)) |>
+  mutate(text = paste("Country: ", country, "\nCO2 per capita (t): ", co2_per_capita, "\nPopulation (M): ", round(population/1000000,2), "\nGdp per capita ($) : ", gdppc, sep="")) |>  
+  ggplot(aes(x=gdppc, y=co2_per_capita, size = population, color = continent, text=text)) +
+  geom_point(alpha=0.7) +
+  scale_size(range = c(1, 20), name="CO2 per capita (t)") +
+  scale_x_log10(breaks = c(1000, 10000, 100000), 
+                labels = c("1 000", "10 000", "100 000"))+
+  scale_color_viridis(discrete=TRUE, guide=FALSE) +
+  theme_ipsum() +
+  theme(legend.position="none")+
+  labs(title = "Chart of country population size by CO2 emissions and GDP", 
+       x= "Annual GDP ($/per capita, in log)", 
+       y= "CO2 emissions (tons of CO2/per capita")
+pp <- ggplotly(p, tooltip="text") |> 
+  layout(annotations = 
+           list(x = 1, y = -0.2, 
+                text = "Source: OWID Data", 
+                showarrow = F, 
+                xref='paper', 
+                yref='paper')
+  )
+pp
+
+```
+
+::: callout-warning
+I must say this graph is pretty useless and it doesn't show much information, but the keyword to remember here is "pretty".
+:::
+
+# Use of `ggiraph`
+
+Let's create two side-by-side visualisations using `ggiraph`. We use the dataset `epa2021` from the package `openintro`
+
+```{r message=FALSE, warning=FALSE}
+# Library
+library(ggplot2)
+library(dplyr)
+library(hrbrthemes)
+library(viridis)
+library(patchwork)
+library(openintro)
+```
+
+First we clean and arrange the data.
+
+```{r warning=FALSE}
+data(epa2021)
+data <- epa2021 |> 
+  mutate(luxury=mfr_name %in% c("Rolls-Royce", "Porsche", "Maserati", "aston martin", "Ferrari", "Lotus", "Jaguar Land Rover L")) |>
+  mutate(luxury=factor(luxury, levels = c(TRUE, FALSE), labels=c("High-end", "Not high-end"))) |>
+  group_by(mfr_name) |>
+  mutate(avg_city_mpg = mean(city_mpg, na.rm=TRUE), 
+         avg_hwy_mpg = mean(hwy_mpg, na.rm=TRUE)) |>
+  ungroup() 
+```
+
+Then we create our first plot.
+
+```{r warning=FALSE}
+p1 <- data |> 
+  ggplot() +
+  geom_segment_interactive(aes(x=forcats::fct_reorder2(mfr_name, desc(as.integer((luxury))), avg_city_mpg), xend=mfr_name, y=avg_city_mpg, yend=avg_hwy_mpg, tooltip=luxury, data_id=luxury), color="grey", size=1.3)+
+  geom_point( aes(x=mfr_name, y=avg_city_mpg), color=rgb(0.2,0.7,0.1,0.5), size=3 ) +
+  geom_point( aes(x=mfr_name, y=avg_hwy_mpg), color="lightblue", size=3 ) +
+  coord_flip()+
+  theme_ipsum() +
+  theme(
+    axis.line = element_line(colour = "grey50"),
+    panel.grid.minor = element_blank(),
+    panel.grid.major.y = element_line(linetype = "dashed"),
+    #panel.background = element_rect(fill = "#fbf9f4", color = "#fbf9f4"),
+    plot.background = element_rect(fill = "#fbf9f4", color = "#fbf9f4"),
+    legend.position = "bottom"
+  ) +
+  labs(title = "Average city/highway mileage",
+       y= "Average mileage", x=NULL) +
+  scale_color_manual(values = c("lightblue", rgb(0.2,0.7,0.1,0.5)),
+                     labels = c("City Mileage", "Highway Mileage"))
+```
+
+Then our second plot.
+
+```{r warning=FALSE}
+p2 <- data |>
+  ggplot( aes(x=forcats::fct_reorder(luxury, desc(as.integer((luxury)))), y=no_cylinders, fill=luxury)) +
+  geom_violin_interactive(aes(data_id=luxury, tooltip=luxury)) +
+  geom_jitter(color="black", size=0.4, alpha=0.9) +
+  scale_fill_viridis(discrete = TRUE, alpha=0.6, option = "G") +
+  theme_ipsum() +
+  coord_flip()+
+  theme(
+    axis.line = element_line(colour = "grey50"),
+    panel.grid.minor = element_blank(),
+    panel.grid.major.y = element_line(linetype = "dashed"),
+    #plot.background = element_rect(fill = "#fbf9f4", color = "#fbf9f4"),
+    legend.position = "none"
+  ) +
+  labs(title = "Number of cylinders",
+       y= "Number of cylinders", x=NULL)
+
+```
+
+Finally we combine them using `ggiraph`
+
+```{r}
+ggiraph::girafe(
+  ggobj = p1 + p2 +
+    plot_annotation(
+      title = 'Car\'s characteristics by manufacturer and luxury type',
+      caption = 'Source: EPA (2021)', 
+      theme = theme(plot.title = element_text(size = 25), 
+      plot.background = element_rect(fill = "#fbf9f4", color = "#fbf9f4"))
+    ),
+  options = list(
+    opts_hover_inv(css = "opacity:0.1;")
+  ),
+  width_svg = 10,
+  height_svg = 6
+)
+```
+
+::: callout-warning
+I don't understand why the geom_point legend set in the first graph by `scale_colour_manual()` doesn't work...
+:::

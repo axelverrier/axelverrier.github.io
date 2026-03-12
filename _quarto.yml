@@ -1,0 +1,29 @@
+project:
+  type: website
+  resources:
+    - cv-092025.pdf
+  output-dir: docs
+
+website:
+  title: "Axel Verrier"
+  search: false
+  favicon: favicon.png
+  back-to-top-navigation: true
+  page-footer: "Axel Verrier · [axel.verrier@mineparis.psl.eu](mailto:axel.verrier@mineparis.psl.eu) · Content licensed under CC BY 4.0"
+  navbar:
+    right:
+      - text: Papers
+        href: papers.qmd
+      - text: Projects
+        href: projects.qmd
+      # - text: Blog
+      #   href: blog.html
+      # - text: Teaching
+      #   href: teaching.qmd
+
+format:
+  html:
+    theme: cosmo
+    css: styles.css
+    toc: false
+    page-layout: full

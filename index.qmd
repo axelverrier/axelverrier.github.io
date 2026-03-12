@@ -1,0 +1,36 @@
+---
+title: "Axel Verrier"
+image: "profile.jpg"
+back-to-top-navigation: false
+about:
+  template: trestles
+  image-width: 70%
+
+  links:
+    - icon: file-earmark-pdf
+      text: CV
+      href: cv-092025.pdf
+    - icon: envelope
+      text: Email
+      url: "mailto:axel.verrier@mineparis.psl.eu"
+---
+
+## About
+
+I am a PhD candidate at [Ecole des Mines – PSL](https://www.minesparis.psl.eu/), and a graduate student from [Paris School of Economics](https://www.parisschoolofeconomics.eu/) and the University of Bordeaux.
+
+My research focuses on the economics of energy transitions and decarbonization policy. I am also deeply interested in environmental justice.
+
+Feel free to reach out about my work or anything else.
+
+## Research interests
+
+- Energy transitions and decarbonization policy
+- Environmental innovation and green technology diffusion
+- Environmental justice
+
+## Affiliations
+
+- **PhD candidate** – Ecole des Mines – PSL
+- **Graduate student** – Paris School of Economics
+- **Graduate student** – University of Bordeaux
