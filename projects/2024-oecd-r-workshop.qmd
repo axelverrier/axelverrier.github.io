@@ -6,15 +6,7 @@ title-block-banner: true
 date: 03-14-2024
 categories: [R, course] 
 
-listing:
-  contents: 2024-oecd-r-workshop
-  fields: [date, title, description]
-  type: table 
-  sort: "date desc" 
-  categories: false
-  filter-ui: false
-  
-draft: false
+draft: true
 ---
 
 This is the results of an OECD workshop on R called [**R4DEV**](https://r4dev.netlify.app/) created and taught by Nelson Amaya. It took place from March to June 2024. During this workshop, I learned how to use R for text analysis, data visualisation: (plots, animated graphs and maps), web scrapping, shiny apps and quarto publishing.

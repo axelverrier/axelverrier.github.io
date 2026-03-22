@@ -6,14 +6,7 @@ title-block-banner: true
 date: 06-03-2025
 #categories: [R, course] 
 
-listing:
-  contents: snippets
-  fields: [title]
-  type: table 
-  categories: false
-  filter-ui: false
-
-draft: false
+draft: true
 ---
 
 

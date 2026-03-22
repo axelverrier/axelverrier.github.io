@@ -1,6 +1,5 @@
 ---
 title: "Blog"
-draft: true
 listing:
   contents: posts
   type: table

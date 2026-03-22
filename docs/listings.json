@@ -1,33 +1,14 @@
 [
   {
-    "listing": "/projects/snippets.html",
-    "items": [
-      "/projects/snippets/wrangling.html",
-      "/projects/snippets/econometrics.html",
-      "/projects/snippets/statistics.html",
-      "/projects/snippets/text_processing.html"
-    ]
-  },
-  {
     "listing": "/blog.html",
     "items": [
-      "/posts/2025-03-01-lorem-ipsum/index.html"
-    ]
-  },
-  {
-    "listing": "/projects/2024-oecd-r-workshop.html",
-    "items": [
-      "/projects/2024-oecd-r-workshop/06_scrapping.html",
-      "/projects/2024-oecd-r-workshop/04_animation.html",
-      "/projects/2024-oecd-r-workshop/03_text.html",
-      "/projects/2024-oecd-r-workshop/02_plots.html"
+      "/posts/2026-03-22-git-tutorial/index.html",
+      "/posts/2025-06-03-code-snippets/index.html",
+      "/posts/2024-03-14-oecd-r-workshop/index.html"
     ]
   },
   {
     "listing": "/projects.html",
-    "items": [
-      "/projects/snippets.html",
-      "/projects/2024-oecd-r-workshop.html"
-    ]
+    "items": []
   }
 ]

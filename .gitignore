@@ -3,3 +3,6 @@
 .claude/
 .RData
 .Rhistory
+posts_raw/
+CLAUDE.md
+*.Rproj

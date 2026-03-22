@@ -3,6 +3,11 @@ project:
   resources:
     - cv-092025.pdf
   output-dir: docs
+  render:
+    - "*.qmd"
+    - "posts/**/*.qmd"
+    - "projects/**/*.qmd"
+    - "!posts_raw/"
 
 website:
   title: "Axel Verrier"
@@ -14,10 +19,8 @@ website:
     right:
       - text: Papers
         href: papers.qmd
-      - text: Projects
-        href: projects.qmd
-      # - text: Blog
-      #   href: blog.html
+      - text: Blog
+        href: blog.html
       # - text: Teaching
       #   href: teaching.qmd
 

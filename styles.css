@@ -54,6 +54,52 @@ details p {
   color: #888;
 }
 
+/* Blog: callout-tip light green background */
+.callout-tip {
+  background-color: #f0fff4;
+}
+
+.callout-tip > .callout-header {
+  background-color: #e2f5e9;
+}
+
+/* Blog: plain code blocks (no language specified) */
+pre:not(.sourceCode) {
+  background-color: #f2f2f2;
+  padding: 0.75rem 1rem;
+  border-radius: 4px;
+}
+
+/* Blog: danger zone block */
+.danger-zone {
+  background-color: #fff0f0;
+  border-left: 3px solid #d9534f;
+  padding: 0.85rem 1.1rem;
+  border-radius: 0 4px 4px 0;
+  margin: 1rem 0;
+}
+
+/* Blog: FAQ collapsible items */
+details.faq-item {
+  border-bottom: 1px solid #e8e0d5;
+  padding-bottom: 0.5rem;
+}
+
+details.faq-item summary {
+  font-style: normal;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #333;
+}
+
+details.faq-item p {
+  background-color: transparent;
+  border-left: none;
+  padding: 0;
+  font-size: 1rem;
+  color: inherit;
+}
+
 /* General content max width on full-layout pages */
 .page-layout-full .content {
   max-width: 860px;

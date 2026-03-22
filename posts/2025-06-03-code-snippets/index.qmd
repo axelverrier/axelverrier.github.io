@@ -1,0 +1,570 @@
+---
+title: "Code snippets"
+description: "Code snippets in R, Python and Stata. Updated once in a while."
+date: 2025-06-03
+toc: true
+toc-location: left
+toc-depth: 3
+execute:
+  eval: false
+---
+
+## Data wrangling
+
+### Loading data
+
+::: {.panel-tabset}
+#### R
+
+```{.r}
+file = ""
+
+#csv
+data <- read.csv(file, header=TRUE, sep=";")
+data <- haven::read_dta(file)
+
+#RData Rda
+data <- load(file)
+
+#RDS
+data <- readRDS(file)
+
+#Stata files (.dta)
+library(haven)
+haven::read_dta(file)
+```
+
+#### Python
+
+```{.python}
+import pandas as pd
+
+file = ""
+
+#csv
+data = pd.read_csv(file, sep=",",
+                    header="infer",
+                    names=None,
+                    usecols=None,
+                    dtype=None,
+                    converters=None,
+                    skiprows=None,
+                    skipfooter=0,
+                    nrows=None)
+
+#Stata files (.dta)
+data = pd.read_stata(file, columns=None)
+```
+
+#### Stata
+
+```{.stata}
+#csv
+import delimited "filename.csv", clear varnames(1) encoding(utf8) case(lower) delimiter(";") rowrange() colrange()
+use "filename.dta", clear
+```
+
+:::
+
+## Statistics
+
+### Summary statistics (basic)
+
+::: {.panel-tabset}
+
+#### R
+
+```{.r}
+library(tidyverse)
+library(e1071)
+library(stargazer)
+
+basic_stats <- function(x) {
+  c(
+    mean = mean(x, na.rm = TRUE),
+    sd = sd(x, na.rm = TRUE),
+    skewness = e1071::skewness(x, na.rm = TRUE),
+    kurtosis = e1071::kurtosis(x, na.rm = TRUE),
+    Q10 = quantile(x, 0.10, na.rm = TRUE, names = FALSE),
+    Q25 = quantile(x, 0.25, na.rm = TRUE, names = FALSE),
+    median = median(x, na.rm = TRUE),
+    Q75 = quantile(x, 0.75, na.rm = TRUE, names = FALSE),
+    Q90 = quantile(x, 0.90, na.rm = TRUE, names = FALSE),
+    IQR = IQR(x, na.rm = TRUE),
+    NAs = sum(is.na(x))
+  )
+}
+
+df_summary_stats <- data %>%
+  select(where(is.numeric)) %>%  # Select only numeric columns
+  map_dfr(basic_stats, .id = "variable") %>%
+  mutate(across(everything(), ~round(.x, 2)))
+
+#latex
+stargazer(df_summary_stats, summary = FALSE, type = "latex", no.space = TRUE, column.sep.width = "1pt")
+#csv
+write.csv(df_summary_stats, "summary_stats.csv", row.names = FALSE) #comma delimiter
+write.table(df_summary_stats, "summary_stats.csv", sep = ";", row.names = FALSE, col.names = TRUE) #other delimiters
+```
+
+#### Python
+
+```{.python}
+import pandas as pd
+import numpy as np
+from scipy.stats import skew, kurtosis
+from tabulate import tabulate
+
+# Define the basic_stats function
+def basic_stats(x):
+    return {
+        'mean': x.mean(),
+        'sd': x.std(),
+        'skewness': skew(x, nan_policy='omit'),
+        'kurtosis': kurtosis(x, nan_policy='omit'),
+        'Q10': x.quantile(0.10),
+        'Q25': x.quantile(0.25),
+        'median': x.median(),
+        'Q75': x.quantile(0.75),
+        'Q90': x.quantile(0.90),
+        'IQR': x.quantile(0.75) - x.quantile(0.25),
+        'NAs': x.isna().sum()
+    }
+```
+
+#### Stata
+
+```{.stata}
+local numeric_vars
+foreach var of varlist `numeric_vars' {
+    robstat `var', statistics(mean sd skewness kurtosis median IQR)
+	estimates store stats_`var'
+}
+
+esttab stats_* using stats.tex, label nostar compress nogaps
+esttab stats_* using stats.csv, label nostar compress nogaps
+```
+
+:::
+
+### Summary statistics (robust)
+
+::: {.panel-tabset}
+
+#### R
+
+```{.r}
+library(tidyverse)
+library(e1071)
+library(stargazer)
+library(DescTools)
+library(robustbase)
+
+stat_location <- function(x) {
+  c(
+    mean = mean(x, na.rm = TRUE),
+    trimmed_mean = mean(x, trim = 0.05, na.rm = TRUE),
+    median = median(x, na.rm = TRUE),
+    HL = DescTools::HodgesLehmann(x, na.rm=TRUE)
+    )
+}
+stat_scale <- function(x) {
+  c(
+    sd = sd(x, na.rm = TRUE),
+    IQR = IQR(x, na.rm = TRUE),
+    MAD = mad(x, na.rm = TRUE),
+    robustbase::Qn(x, na.rm = TRUE)
+    )
+}
+
+df <- data %>%
+  select(where(is.numeric)) %>%  # Select only numeric columns
+  map_dfr(stat_location, .id = "variable") %>%
+  mutate(across(everything(), ~round(.x, 2)))
+
+df <- data %>%
+  select(where(is.numeric)) %>%  # Select only numeric columns
+  map_dfr(stat_scale, .id = "variable") %>%
+  mutate(across(everything(), ~round(.x, 2)))
+
+#export latex
+stargazer(df, summary = FALSE, type = "latex", no.space = TRUE, column.sep.width = "1pt")
+
+#export csv
+write.csv(df, "summary_stats.csv", row.names = FALSE) #comma delimiter
+write.table(df, "summary_stats.csv", sep = ";", row.names = FALSE, col.names = TRUE) #other delimiters
+```
+
+#### Stata
+
+```{.stata}
+local numeric_vars
+foreach var of varlist `numeric_vars' {
+    robstat `var', statistics(mean alpha5 median HL)
+	estimates store rb_loc_`var'
+}
+
+foreach var of varlist `numeric_vars' {
+    robstat `var', statistics(sd IQR MAD Qn)
+	estimates store rb_scale_`var'
+}
+
+//export tex
+esttab rb_loc_* using rb_stats_loc.tex, label nostar compress nogaps
+esttab rb_scale_* using rb_stats_scale.tex, label nostar compress nogaps
+
+//export csv
+esttab rb_loc_* using rb_stats_loc.csv, label nostar compress nogaps
+esttab rb_scale_* using rb_stats_scale.csv, label nostar compress nogaps
+```
+
+:::
+
+### Summary statistics for qualitative variables
+
+::: {.panel-tabset}
+
+#### R
+
+```{.r}
+library(tidyverse)
+
+stats_qual <- function(x) {
+  mode_val <- names(sort(table(x), decreasing = TRUE))[1]
+  mode_prop <- round(sort(table(x), decreasing = TRUE)[[1]] / sum(table(x)), 1)
+
+  data.frame(
+    unique = length(unique(x)),
+    NAs = sum(is.na(x)),
+    mode = paste0(mode_val, " (", mode_prop, ")")
+  )
+}
+
+df_summary_stats <- data %>%
+  select(where(is.factor)) %>%
+  map_dfr(stats_qual, .id = "variable")
+
+#csv
+write.csv(df_summary_stats, "summary_stats.csv", row.names = FALSE) #comma delimiter
+write.table(df_summary_stats, "summary_stats.csv", sep = ";", row.names = FALSE, col.names = TRUE) #other delimiters
+```
+
+#### Python
+
+:::
+
+## Econometrics
+
+### Regressions
+
+#### Binary outcome
+
+::: {.panel-tabset}
+
+##### R
+
+```{.r}
+# set y as factor
+y <- factor(y, levels = c(0, 1), labels = c("zero", "one"))
+
+#logit
+logit <- glm(y ~ d + X, data = mydata, family = binomial(link = "logit"))
+summary(logit)
+
+#probit
+probit <- glm(y ~ d + X, data = mydata, family = binomial(link = "probit"))
+summary(probit)
+```
+
+add margins and how to compute marginal effects here
+
+:::
+
+#### Continuous outcome
+
+::: {.panel-tabset}
+
+##### R
+
+I use base R, `fixest::feols()` and `lfe:felm()`.
+
+```{.r}
+# Use base::mtcars data
+ ols <- lm(mpg ~ wt + ., data = mtcars)
+summary(ols)
+```
+
+Adding FE
+```{.r}
+library(stargazer)
+library(lfe)
+library(fixest)
+
+data(mtcars)
+mtcars <- mtcars %>% mutate(year=rep(seq(2000,2003),8)) #add years to the data
+
+reg1 <- lm(mpg ~ wt + as.factor(year), mtcars)
+reg2 <- lfe::felm(mpg ~ wt|year|0|0, mtcars)
+reg3 <- fixest::feols(mpg ~ wt | year, data = mtcars)
+
+#compare; all those methods are equivalent
+stargazer::stargazer(reg1, reg2, type = 'text', keep = "wt")
+summary(reg3, se = "standard")
+#Note: feols is not supported by stargazer :/
+```
+
+Correcting for heteroskedasticity (robust SE)
+```{.r}
+library(lmtest)
+library(sandwich)
+library(lfe)
+library(fixest)
+
+#load data
+data(mtcars)
+
+# All those methods are equivalent
+reg1 <- lm(mpg ~ wt, mtcars)
+reg1 <- coeftest(reg1, vcov. = vcovHC(reg1, type = "HC1"))
+summary(reg1)
+
+reg2 <- lfe::felm(mpg ~ wt|0|0|0, mtcars)
+summary(reg2, robust=TRUE)
+
+reg3 <- fixest::feols(mpg ~ wt, data=mtcars, vcov = 'HC1')
+summary(reg3)
+
+# options for type={const, HC0, ..., HC5}
+# const for constant variance (usual estimates)
+# HC0 is White's estimator
+# HC3 is the default as recommended per Long & Ervin (2000)
+# more recent research suggest using HC4m (small sample) or HC5
+```
+
+Clustering SE
+```{.r}
+library(lmtest)
+library(sandwich)
+library(lfe)
+library(fixest)
+
+data(mtcars)
+mtcars <- mtcars %>% mutate(year=rep(seq(2000,2003),8)) #add years to the data
+
+#cluster SE by year; all those methods are equivalent
+reg1 <- lm(mpg ~ wt, mtcars)
+reg1 <- coeftest(reg1, vcov. = vcovCL(reg1, cluster=~year))
+print(reg1)
+
+reg2 <- lfe::felm(mpg ~ wt|0|0|year, mtcars)
+summary(reg2)
+
+reg3 <- fixest::feols(mpg ~ wt , data = mtcars, cluster = "year")
+summary(reg3)
+```
+
+##### Python
+
+```{.python}
+# USING STATS MODEL
+import statsmodels.api as sm
+import numpy as np
+import pandas as pd
+
+mtcars = sm.datasets.get_rdataset('mtcars')
+mtcars = pd.DataFrame(mtcars.data)
+
+#first specify formula
+X = [col for col in mtcars.columns if col not in ['mpg', 'wt']]
+formula = 'mpg ~ wt + ' + ' + '.join(X)
+model = sm.formula.ols(formula, mtcars)
+
+#fit the model
+model = model.fit()
+print(model.summary())
+
+#when specifying the formula and then fitting, there is no need to add a constant, however when using sm.OLS, you do.
+X = mtcars.drop(columns=["mpg"])
+X = sm.add_constant(X)  # Adds intercept term (column of 1s)
+y = mtcars['mpg']
+model = sm.OLS(y, X).fit()
+print(model.summary())
+```
+
+Correcting for heteroskedasticity (robust se)
+```{.python}
+robust_results = model.get_robustcov_results(cov_type='HC3')
+print(robust_results.summary())
+```
+
+Clustered se (account for correlation within groups)
+```{.python}
+robust_results = model.get_robustcov_results(cov_type='cluster', groups=mtcars['gear'])
+print(robust_results.summary())
+```
+
+##### Stata
+
+```{.stata}
+reg y x1 x2
+reg y x1 x2, robust
+reg y x1 x2, vce(cluster groupvar)
+```
+
+:::
+
+#### Instrumental variables
+
+Tests of relevance (weakness of the instrument)
+
+- For a single instrument, use Stock and Staiger (1997)'s informal rule of thumb: the first-stage F-statistic for the instrument should be > 10
+- For multiple instruments, compare the Cragg-Donald Wald F statistic (= joint relevance of the instruments) to the critical values of Stock-Yogo (2005). This measures the bias with OLS.
+
+:::{.callout-warning}
+Comparing the Cragg-Donald Wald F to the Stock-Yogo critical values is only valid for i.i.d. errors and homoskedasticity. In case of heteroskedasticity or clustering, use the Kleibergen-Paap rk Wald F statistics instead.
+:::
+
+::: {.panel-tabset}
+
+##### R
+
+```{.r}
+library(ivmodel)
+data(card.data)
+
+# Manually
+stage1 <- lm(educ ~ nearc4 +IQ + married + black + smsa + exper, data = card.data)
+x_hat <- predict(stage1, newdata = card.data)
+stage2 <- lm(lwage ~ x_hat +IQ + married + black + smsa + exper, data = card.data)
+summary(stage2)
+
+#using AER::ivreg
+iv_est <- AER::ivreg(lwage ~ educ + IQ + married + black + smsa + exper | nearc4 + IQ + married + black + smsa + exper, data = card.data)
+summary(iv_est, diagnostics = TRUE)
+
+#using lfe::felm
+iv_est <- lfe::felm(lwage ~ IQ + married + black + smsa + exper | 0 | (educ ~ nearc4) | 0, data = card.data)
+summary(iv_est)
+summary(iv_est$stage1)
+
+#using fixest::feols
+iv_est <- fixest::feols(lwage ~ IQ + married + black + smsa + exper | educ ~ nearc4, data = card.data)
+summary(iv_est, stage = 1:2)
+```
+
+###### Testing for the relevance of the instrument / weakness
+
+```{.r}
+# Stock and Saiger rule of thumb (1997)
+stage1 <- lm(educ ~ nearc4, data = card.data)
+summary(stage1)
+
+stage1 <- lm(educ ~ nearc4 + IQ + married + black + smsa + exper, data = card.data)
+car::linearHypothesis(stage1, "nearc4 = 0") # to compute the partial F-stat, in the case of controls
+
+#for ivreg, felm and feols, F-stat is displayed using summary
+```
+
+##### Python
+
+```{.python}
+```
+
+##### Stata
+
+Data available [\[here\]](https://www.stata.com/data/jwooldridge/eacsap/card.dta)
+
+```{.stata}
+* Manually
+reg educ nearc4 $controls // regress X on Z
+predict x_hat // Compute X_hat
+reg lwage x_hat $controls // regress Y on X_hat
+
+* Using the ivregress command
+ivregress 2sls lwage (educ=nearc4) $controls
+
+//Display first stage
+ivregress 2sls lwage (educ=nearc4) $controls , first
+
+*using ivreg2
+ssc install ivreg2
+ssc install ranktest
+ivreg2 lwage (educ = nearc4) $controls
+```
+
+###### Testing for the relevance of the instrument / weakness
+
+```{.stata}
+* Stock and Saiger rule of thumb (1997)
+reg educ nearc4 $controls
+test nearc4
+//Note: automatically computes the partial F statistics if controls
+
+*Stock-Yogo (2005) critical values
+ivreg2 lwage (educ = nearc4 fatheduc) $controls
+* ivreg2 automatically report Kleibergen-Paap rk Wald F if robust, cluster or bw is used.
+```
+
+:::
+
+## Text processing
+
+Some resources:
+
+-   Julia Silge & David Robinson, Text Mining with R: A Tidy Approach (2025) [link](https://www.tidytextmining.com/)
+
+-   Julia Silge & Emil Hvitfeldt, Supervised Machine Learning for Text Analysis in R (2022) [link](https://smltar.com/)
+
+### Loading PDF files
+
+Use [Total sustainability report 2019](https://totalenergies.com/sites/g/files/nytnzq121/files/atoms/files/total_rapport_climat_2019_en.pdf)
+
+::: panel-tabset
+
+#### R
+
+```{.r}
+library(pdftools)
+
+file = "total_rapport_climat_2019_en.pdf"
+
+pages <- pdf_text(file)
+page6 <- pages[6]
+```
+
+#### Python
+
+In Python, there are 2 mains libraries for reading PDF files: [pypdf](https://pypdf.readthedocs.io/), which is the merging of pyPdf and PyPDF2 [\[history\]](https://pypdf.readthedocs.io/en/stable/meta/history.html) and [PyMuPDF](https://pymupdf.readthedocs.io/).
+
+```{.python}
+file = "total_rapport_climat_2019_en.pdf"
+
+#using pypdf
+import pypdf
+
+reader = pypdf.PdfReader(file)
+
+#extract the text on the 6th page
+page6 = reader.pages[5].extract_text(0)
+
+#store each page in a list
+pages = [reader.pages[page_num].extract_text() for page_num in range(len(reader.pages))]
+
+
+#using pymupdf
+import pymupdf
+doc = pymupdf.open(file)
+
+#extract the text on the 6th page
+page6 = doc.load_page(5).get_text()
+
+#store each page in a list
+pages = [doc.load_page(page_num).get_text("text") for page_num in range(doc.page_count)]
+
+
+#merge list element into one 1 element
+raw_text = []
+raw_text.append(pages)
+```
+
+:::

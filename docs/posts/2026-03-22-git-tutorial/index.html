@@ -1,0 +1,1065 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.4.551">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="dcterms.date" content="2026-03-22">
+<meta name="description" content="A practical introduction to Git and GitHub for researchers, covering version control basics, branches, and collaboration.">
+
+<title>Axel Verrier - An introduction to git for applied economics</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<link href="../../favicon.png" rel="icon" type="image/png">
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+
+<link rel="stylesheet" href="../../styles.css">
+</head>
+
+<body class="floating nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">Axel Verrier</span>
+    </a>
+  </div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../papers.html"> 
+<span class="menu-text">Papers</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../blog.html"> 
+<span class="menu-text">Blog</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+          <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-full page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#what-is-git" id="toc-what-is-git" class="nav-link active" data-scroll-target="#what-is-git">What is Git?</a></li>
+  <li><a href="#why-use-git" id="toc-why-use-git" class="nav-link" data-scroll-target="#why-use-git">Why use Git?</a></li>
+  <li><a href="#installing-git" id="toc-installing-git" class="nav-link" data-scroll-target="#installing-git">1. Installing Git</a>
+  <ul class="collapse">
+  <li><a href="#terminal-or-vscode" id="toc-terminal-or-vscode" class="nav-link" data-scroll-target="#terminal-or-vscode">1.1 Terminal or VSCode</a></li>
+  </ul></li>
+  <li><a href="#using-git" id="toc-using-git" class="nav-link" data-scroll-target="#using-git">2. Using Git</a>
+  <ul class="collapse">
+  <li><a href="#initializing-a-repository" id="toc-initializing-a-repository" class="nav-link" data-scroll-target="#initializing-a-repository">2.1 Initializing a repository</a></li>
+  <li><a href="#the-stages-of-git" id="toc-the-stages-of-git" class="nav-link" data-scroll-target="#the-stages-of-git">2.2 The stages of Git</a></li>
+  <li><a href="#inspecting-your-history" id="toc-inspecting-your-history" class="nav-link" data-scroll-target="#inspecting-your-history">2.3 Inspecting your history</a></li>
+  <li><a href="#reviewing-a-previous-version" id="toc-reviewing-a-previous-version" class="nav-link" data-scroll-target="#reviewing-a-previous-version">2.4 Reviewing a previous version</a></li>
+  <li><a href="#restoring-a-previous-version-of-the-code" id="toc-restoring-a-previous-version-of-the-code" class="nav-link" data-scroll-target="#restoring-a-previous-version-of-the-code">2.5 Restoring a previous version of the code</a></li>
+  <li><a href="#using-branches" id="toc-using-branches" class="nav-link" data-scroll-target="#using-branches">2.6 Using branches</a></li>
+  </ul></li>
+  <li><a href="#collaborating-on-github" id="toc-collaborating-on-github" class="nav-link" data-scroll-target="#collaborating-on-github">3. Collaborating on GitHub</a>
+  <ul class="collapse">
+  <li><a href="#the-basic-shared-workflow" id="toc-the-basic-shared-workflow" class="nav-link" data-scroll-target="#the-basic-shared-workflow">3.1 The basic shared workflow</a></li>
+  <li><a href="#resolving-merge-conflicts" id="toc-resolving-merge-conflicts" class="nav-link" data-scroll-target="#resolving-merge-conflicts">3.2 Resolving merge conflicts</a></li>
+  </ul></li>
+  <li><a href="#solo-workflow" id="toc-solo-workflow" class="nav-link" data-scroll-target="#solo-workflow">4. Solo workflow</a></li>
+  <li><a href="#danger-zone" id="toc-danger-zone" class="nav-link" data-scroll-target="#danger-zone">Danger Zone</a></li>
+  <li><a href="#faq" id="toc-faq" class="nav-link" data-scroll-target="#faq">FAQ</a></li>
+  <li><a href="#quick-code-reference" id="toc-quick-code-reference" class="nav-link" data-scroll-target="#quick-code-reference">Quick code reference</a></li>
+  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
+  </ul>
+</nav>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
+    </div>
+<!-- main -->
+<main class="content column-page-right" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">An introduction to git for applied economics</h1>
+</div>
+
+<div>
+  <div class="description">
+    A practical introduction to Git and GitHub for researchers, covering version control basics, branches, and collaboration.
+  </div>
+</div>
+
+
+<div class="quarto-title-meta column-page-right">
+
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">March 22, 2026</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="what-is-git" class="level2">
+<h2 class="anchored" data-anchor-id="what-is-git">What is Git?</h2>
+<p>Git is a version control tool. It tracks changes to your files over time. Every time you save a snapshot, Git records what changed, when, and why. You can go back to any previous snapshot at any point.</p>
+</section>
+<section id="why-use-git" class="level2">
+<h2 class="anchored" data-anchor-id="why-use-git">Why use Git?</h2>
+<p>Git helps coding in a much cleaner way. While doing analysis, you often change your code, rearrange parts, test new things. It’s easy to get confused and end up with both complicated and meaningless filenames <code>analysis_part1_v3.py</code>. It is also incredibly hard to go back in time to see your code, <code>ctrl+Z</code> can only do so much. Using Git avoids that. Think of it as checkpoints. At any time, you can go back to one of the previous version of your code, and then compare between the two or start again in a different direction.</p>
+<p><strong>Git vs.&nbsp;GitHub</strong></p>
+<p>It’s easy to get confused between the two, but Git and GitHub are two different things.</p>
+<ul>
+<li><strong>Git</strong> is a tool that runs locally on your computer. It’s the one doing the version tracking.</li>
+<li><strong>GitHub</strong> is a website that you can use to store your files and your Git history in the cloud. It’s a way to backup and share your code with others.</li>
+</ul>
+</section>
+<section id="installing-git" class="level2">
+<h2 class="anchored" data-anchor-id="installing-git">1. Installing Git</h2>
+<p>Go to <a href="https://git-scm.com">https://git-scm.com</a> and download Git for your operating system. Installation steps are explained <a href="https://git-scm.com/book/en/v2/Getting-Started-Installing-Git">here</a>. Once this is done, you’ll need to create a username. This is how Git knows <em>who</em> made changes. The easiest way is to use the terminal.</p>
+<pre class="console"><code>$ git config --global user.name "John Doe"
+$ git config --global user.email johndoe@example.com</code></pre>
+<section id="terminal-or-vscode" class="level3">
+<h3 class="anchored" data-anchor-id="terminal-or-vscode">1.1 Terminal or VSCode</h3>
+<p>Git is a command-line tool, which you use from the terminal. However, most IDEs (RStudio, VSCode) detect Git automatically once it is installed and let you use it through a graphical interface. To my knowledge, Stata does not have an integration of Git, which means you’ll have to use the command line in that case.</p>
+</section>
+</section>
+<section id="using-git" class="level2">
+<h2 class="anchored" data-anchor-id="using-git">2. Using Git</h2>
+<section id="initializing-a-repository" class="level3">
+<h3 class="anchored" data-anchor-id="initializing-a-repository">2.1 Initializing a repository</h3>
+<p>A repository (or “repo”) is your project folder being tracked by Git. When you initialize a repository, Git creates a hidden <code>.git</code> folder inside it. This is where all your history, snapshots, and configuration live. You never need to touch <code>.git</code> directly. To initialize git in a folder:</p>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" role="tab" aria-controls="tabset-1-1" aria-selected="true">Terminal</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-2" role="tab" aria-controls="tabset-1-2" aria-selected="false">VSCode</a></li></ul>
+<div class="tab-content">
+<div id="tabset-1-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-1-1-tab">
+<p>Navigate to your project’s folder, open a terminal and run <code>git init</code>.</p>
+</div>
+<div id="tabset-1-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-2-tab">
+<p>Open the Source control panel on the left, and hit <em>Initialize repository</em>.</p>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+What should be tracked?
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Not all files deserve to be tracked. Some files never change (your original data), some you don’t need to track changes (your temporary data for some side analysis, your logs). I suggest using version control mainly for your scripts, and depending on how you use it, your results/output.</p>
+<p>Git has developed a special file to specify all that should never be tracked: <code>.gitignore</code> (it’s literally the name of the file, nothing before the dot). You put it in your project root and list files or folders to ignore. Git will then pretend those files don’t exist. This is what it looks like:</p>
+<pre><code># ignore the data directory and its subfolders and files
+data/
+
+# ignore all the dta files
+*.dta</code></pre>
+<p>The <code>.gitignore</code> file is essential for keeping data files and other temporary files untracked and keeping your workflow clean.</p>
+</div>
+</div>
+</section>
+<section id="the-stages-of-git" class="level3">
+<h3 class="anchored" data-anchor-id="the-stages-of-git">2.2 The stages of Git</h3>
+<p>This is the most important part for understanding Git. To perform version controls, Git implicitly assigns your files to different status.</p>
+<p>By default, all files are <strong>untracked</strong>. This means Git does not keep track of their versions in its history. To start tracking files, you need to <strong>commit</strong> them a first time. Committing is just like saving a file, it means that Git keeps a snapshot of the file at this time in its history. If you change a file that has been committed, it will be marked as <strong>modified</strong>: Git knows the file, but it has changed since the last commit.</p>
+<p>A final state is <strong>staged</strong>. Staging a file means you’ve marked the file to be included in the next commit but you have not yet committed. This is useful when you only want to commit (=take a snapshot of) some files while keep working on others and not commit them right away. Git will only commit your staged files.</p>
+<p>At any time, you see the status of your files.</p>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-2-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-1" role="tab" aria-controls="tabset-2-1" aria-selected="true">Terminal</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-2" role="tab" aria-controls="tabset-2-2" aria-selected="false">VSCode</a></li></ul>
+<div class="tab-content">
+<div id="tabset-2-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-2-1-tab">
+<p>Let’s use an example:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># create a new folder and navigate into it</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> mkdir <span class="ex">newproject</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> cd <span class="ex">newproject</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="co"># initializes the repo</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> git <span class="ex">init</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="ex">Initialized</span> empty Git repository in path/to/project/.git/</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="co"># create an example do-file</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> echo <span class="st">"use data/mydata.dta, clear"</span> <span class="op">&gt;</span> load_data.do</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="co"># this command stages the file. If you want to stage all files, you can type `git add .`</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> git <span class="ex">add</span> load_data.do</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Commit your staged files. The "-m" flag lets you add a message (mandatory).</span></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Git then returns a summary of what has changed</span></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> git <span class="ex">commit</span> <span class="at">-m</span> <span class="st">"Initialized repo and load_data"</span></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a><span class="ex">[master</span> <span class="er">(</span><span class="ex">root-commit</span><span class="kw">)</span> <span class="ex">e4bce04]</span> Initialized repo and load_data</span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a> <span class="ex">1</span> file changed, 1 insertion<span class="er">(</span><span class="ex">+</span><span class="kw">)</span></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a> <span class="ex">create</span> mode 100644 load_data.do</span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a><span class="co"># Let's say you change your file again</span></span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> echo <span class="st">"use data2/mydata2.dta, clear"</span> <span class="op">&gt;</span> load_data.do</span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a><span class="co"># check the status of your files</span></span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> git <span class="ex">status</span></span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a><span class="ex">On</span> branch master</span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a><span class="ex">Changes</span> not staged for commit:</span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a>        <span class="ex">modified:</span>   load_data.do</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="tabset-2-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-2-tab">
+<p>Once your repo is initialized, check out the Source Control panel.</p>
+<p>The <strong>CHANGES</strong> section acts like a continuous <code>git status</code>. As soon as you modify and save a file, its status will change accordingly. Files and directories specified in <code>.gitignore</code> will not appear in this panel.</p>
+<p>The letters on the right of each file specify its status: U for Untracked, M for Modified (compared to the previous commit), A for Added when it is the first time you stage this file.</p>
+<ul>
+<li>To stage a file, hover over its filename in the Source Control panel and hit the <code>+</code> button. The file will be moved from the <em>Changes</em> subsection to <em>Staged Changes</em>.</li>
+<li>To commit, add a message and hit <code>Commit</code>. This will only commit your staged changes.</li>
+<li>Once you commit, you can see a starting point in the <strong>GRAPH</strong> panel below with your comment. This is your history of commits.</li>
+</ul>
+</div>
+</div>
+</div>
+<p>Finally, one last state/action, reserved to using Git with GitHub, is to <strong>push</strong>. Pushing means uploading the changes online. Before pushing, your changes are saved locally, after, they are saved on GitHub. I explain working with GitHub later.</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+When to commit?
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>It’s always hard to know when to commit. You don’t want to commit every little change because it is easy to get overwhelmed, but at the same time you don’t want to wait too much before committing, otherwise it might be hard to get back to the intermediate state you want. I have 2 rules of thumb for committing.</p>
+<ol type="1">
+<li><p><strong>Use one commit per change.</strong> By change I mean a set of changes that go together. For example adding a new script to load the data, fixing a bug, modifying a function and how it is called in every script. 1 main modification, 1 comment, 1 commit. If you change three analyses and update your figures’ titles and refactor how your code works together at the same time, and only commit once, it’s super hard to understand what you did when you come back a month later.</p>
+<p>Note: It doesn’t mean that you have to work on one single task at the time, you can simply choose which files you put in your next commit (=stage).</p></li>
+<li><p><strong>Always commit working code.</strong> I try to always commit code that is running without error, i.e.&nbsp;not half-finished or still-in-progress code. It’s pretty useless to save half-finished code because if you come back 2 weeks later, you simply have no clue what you wanted to do and why it goes wrong.</p></li>
+</ol>
+<p>In the end, the worst rule you can adopt is committing everything at the end of every day/week (which was what I did at first). It’s just messy.</p>
+</div>
+</div>
+</section>
+<section id="inspecting-your-history" class="level3">
+<h3 class="anchored" data-anchor-id="inspecting-your-history">2.3 Inspecting your history</h3>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-3-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-1" role="tab" aria-controls="tabset-3-1" aria-selected="true">Terminal</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-3-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-2" role="tab" aria-controls="tabset-3-2" aria-selected="false">VSCode</a></li></ul>
+<div class="tab-content">
+<div id="tabset-3-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-3-1-tab">
+<p>To see your commit history, run:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># full history with hashes, author, date, message</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> git <span class="ex">log</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="ex">commit</span> e4bce0404cb210a623c82db39626fba1f9d85107 <span class="er">(</span><span class="ex">HEAD</span> <span class="at">-</span><span class="op">&gt;</span> master<span class="kw">)</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="ex">Author:</span> Axel Verrier <span class="op">&lt;</span>xxx@xxx.xxx<span class="op">&gt;</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="ex">Date:</span>   Fri Mar 20 11:45:33 2026 +0100</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    <span class="ex">Initialized</span> repo and load_data</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="co"># compact one-line-per-commit view</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> git <span class="ex">log</span> <span class="at">--oneline</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a><span class="ex">e4bce04</span> <span class="er">(</span><span class="ex">HEAD</span> <span class="at">-</span><span class="op">&gt;</span> master<span class="kw">)</span> <span class="ex">Initialized</span> repo and load_data</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Each commit has a unique hash (something that looks like <code>e4bce04</code>) to identify it. You can use it to navigate history.</p>
+<p><code>(HEAD -&gt; master)</code> tells you where you are. <code>master</code> is your current branch; <code>HEAD</code> is the pointer to your current position in history. The <code>-&gt;</code> means they’re aligned. If you checkout an old commit to inspect it, HEAD detaches from the branch and that arrow disappears until you return. We will talk about branches later.</p>
+<p>Another command is <code>git diff</code>. It allows you to see line-by-line changes that are <em>not yet staged</em> (differences between your working directory and the staging area). To see changes you <em>have</em> staged, use <code>git diff --staged</code>.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># compare changes in a specific file</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> git <span class="fu">diff</span> load_data.do</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="fu">diff</span> <span class="at">--git</span> a/load_data.do b/load_data.do</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="ex">index</span> 0dd93a8..a05e7b8 100644</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="ex">---</span> a/load_data.do</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="ex">+++</span> b/load_data.do</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="ex">@@</span> <span class="at">-1</span> +1 @@</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="ex">-</span><span class="st">"use data/mydata.dta, clear"</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="ex">+</span><span class="st">"use data/mydata2.dta, clear"</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a><span class="co"># compare current file against an older commit: use the hash number</span></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> git <span class="fu">diff</span> e4bce04 load_data.do</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><strong>How to understand it:</strong></p>
+<pre><code>diff --git a/load_data.do b/load_data.do</code></pre>
+<p>This compares the names of the file, in case they changed.</p>
+<pre><code>index 0dd93a8..a05e7b8 100644</code></pre>
+<p>This part is useless, it’s just Git metadata.</p>
+<pre><code>--- a/load_data.do
++++ b/load_data.do</code></pre>
+<p>This tells you which files have changed. Git doesn’t track edits per se but deletions and insertions. An edit shows up as one <code>-</code> line and one <code>+</code> line. Here I replaced <code>use data/mydata.dta, clear</code> by <code>use data2/mydata2.dta, clear</code> so the first gets deleted and the second is added.</p>
+<pre><code>@@ -1 +1 @@</code></pre>
+<p>The header tells you where the changes are in the file. The format is <code>@@ -start,count +start,count @@</code>. Here: the change starts at line 1 of the old file (-1) and line 1 of the new file (+1). When the count is 1 it’s omitted. In a larger file you’d see something like <code>@@ -45,6 +45,7 @@</code>, meaning “starting at line 45, showing 6 old lines / 7 new lines.”</p>
+<pre><code>-"use data/mydata.dta, clear"
++"use data/mydata2.dta, clear"</code></pre>
+<p>The actual change. <code>-</code> (in red) = line removed, <code>+</code> (in green) = line added.</p>
+</div>
+<div id="tabset-3-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-3-2-tab">
+<p>In VSCode, you can easily look at your commit history in the GRAPH panel. If you click on one of your commits, you will be able to see which files have been changed and how. You can inspect file differences line-by-line when clicking on a file.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="reviewing-a-previous-version" class="level3">
+<h3 class="anchored" data-anchor-id="reviewing-a-previous-version">2.4 Reviewing a previous version</h3>
+<p>To check out how your code was at a previous commit, you run a command called <strong>checkout</strong>. To check out a specific commit, you need its identifier (its hash).</p>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-4-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-4-1" role="tab" aria-controls="tabset-4-1" aria-selected="true">Terminal</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-4-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-4-2" role="tab" aria-controls="tabset-4-2" aria-selected="false">VSCode</a></li></ul>
+<div class="tab-content">
+<div id="tabset-4-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-4-1-tab">
+<p>The command is <code>git checkout [hash]</code>:</p>
+<pre class="shell"><code># find the identifier for the commit you want to check
+&gt; git log
+# Review past code using checkout
+&gt; git checkout a3f9c12
+# return to current state of the code by using:
+&gt; git checkout main</code></pre>
+<p>This allows you to temporarily review your files at the time of the commit. If you now look at your folder, its state is what it was at that time: the files added after this commit are gone, the ones that were deleted are back, and the changes are reverted. This is not permanent. Run <code>git checkout main</code> to return to the present.</p>
+</div>
+<div id="tabset-4-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-4-2-tab">
+<p>On VSCode, you can find the hash by hovering your mouse over the commit you’re interested in. Then right-click on your branch in GRAPH, and hit <em>Checkout (detached)</em>. If you now look at your explorer (inside VSCode), you’ll see the state of your files at that time. To resume current work, click on the hash at the very bottom-left of the screen, it opens up the top command panel, and hit on the bottom branch, usually called master or main.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="restoring-a-previous-version-of-the-code" class="level3">
+<h3 class="anchored" data-anchor-id="restoring-a-previous-version-of-the-code">2.5 Restoring a previous version of the code</h3>
+<p>There are several ways of restoring an old version of the code.</p>
+<ul>
+<li><p><strong>If you only want to cancel your last commit</strong>, you can undo it safely by using <code>git revert a3f9c12</code>. This actually creates a new commit that reverses the changes of the specified commit.</p>
+<p>On VSCode, hit the three dots “…” next to CHANGES, then <em>Commit</em> &gt; <em>Undo Last Commit</em>.</p></li>
+<li><p>If you want to go back and start again from a previous point in time, you do a <code>reset</code>. There are 2 types of reset:</p>
+<ul>
+<li><p><strong>Soft reset</strong>. A soft reset will cancel all the commits after this one, but will keep changes staged, i.e.&nbsp;your code will stay the same as before the reset but the snapshot will be gone, and you have the opportunity to recommit. This is useful if you committed too early or want to consolidate several small commits into a big one.</p>
+<p><code>git reset --soft a3f9c12</code></p></li>
+<li><p><strong>Hard reset</strong>. A hard reset cancels all commits after the chosen one and discards all changes. Your code will return to its original state at that time.</p>
+<p><code>git reset --hard a3f9c12</code></p></li>
+</ul></li>
+</ul>
+<p>Although there are several workarounds, I did not find a reset option in VSCode so the best is to do it from the terminal for this one.</p>
+<p>Those were the main ways of undoing things, but the most interesting thing about Git is its branches. Branches allow you to work on different versions of your code in parallel. This is the next part.</p>
+</section>
+<section id="using-branches" class="level3">
+<h3 class="anchored" data-anchor-id="using-branches">2.6 Using branches</h3>
+<p>A branch is a copy of your project. This allows you to work on several features at once, in parallel. For example, assume you’re working on an optimization programme and want to implement new constraints, each of them requiring modifying multiple files: the actual code where you define the constraint, the main script where it will be called, the parameters it will be taking and maybe you need to adjust a couple other functions to make it all interact together nicely. You can develop each of these on a separate branch, so that you can work on them and test them independently and at the same time, without touching your main analysis. At the end, you can merge them altogether (and resolve potential arising conflicts).</p>
+<p>Think of it as a tree:</p>
+<ul>
+<li>You have a trunk: it is the initial branch that is created when initializing git (usually called <em>main</em> or <em>master</em>).</li>
+<li>At any given commit, you can create a node and grow one (or several) new branches that will share the same initial base. You can also grow a branch from another branch.</li>
+<li>(Unlike a tree), you can merge back branches when you feel like it.</li>
+</ul>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-5-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-5-1" role="tab" aria-controls="tabset-5-1" aria-selected="true">Terminal</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-5-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-5-2" role="tab" aria-controls="tabset-5-2" aria-selected="false">VSCode</a></li></ul>
+<div class="tab-content">
+<div id="tabset-5-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-5-1-tab">
+<p>To create a new branch, you can use the <code>branch</code> command.</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># create a new branch from where you are now</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> git <span class="ex">branch</span> capacity_constraint</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> git <span class="ex">checkout</span> capacity_constraint    <span class="co"># switch to this new branch</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="co"># or start from a specific past commit</span></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> git <span class="ex">checkout</span> <span class="at">-b</span> capacity_constraint a3f9c12</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<blockquote class="blockquote">
+<p><strong>Note:</strong> Git requires your working directory to be up to date before you can switch branches. If you have uncommitted changes, either commit them first or use <code>git stash</code> to shelve them temporarily (see FAQ).</p>
+</blockquote>
+<p>Now make your changes. Add commits as usual. When you’re satisfied, you can choose to merge a branch to your main branch. This will merge all the modifications.</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> git <span class="ex">checkout</span> main                 <span class="co"># go back to main</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> git <span class="ex">merge</span> capacity_constraint     <span class="co"># bring in the changes</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> git <span class="ex">branch</span> <span class="at">-d</span> capacity_constraint <span class="co"># delete the temporary branch: not useful anymore</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="tabset-5-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-5-2-tab">
+<p>In VSCode, to create a new branch, go to <strong>…</strong> (next to CHANGES) &gt; <em>Branch</em> &gt; <em>Create branch</em>. If you want to create a new branch from a specific commit, right-click on the commit, then <em>Create branch</em>.</p>
+</div>
+</div>
+</div>
+<p>Simple merges, where the two branches changed different files or different lines, happen automatically. But when two branches changed the same lines, you get a conflict and Git asks you to resolve it manually.</p>
+</section>
+</section>
+<section id="collaborating-on-github" class="level2">
+<h2 class="anchored" data-anchor-id="collaborating-on-github">3. Collaborating on GitHub</h2>
+<p>When working with others, GitHub makes collaboration much cleaner than Dropbox or email.</p>
+<p>Two options:</p>
+<ol type="1">
+<li><strong>You create the repo on GitHub</strong>.
+<ul>
+<li>If not already, create a local folder, initialize git and make a first commit (for eg add a <code>.gitignore</code> file).</li>
+<li>Then go to GitHub and click <strong>New repository</strong>. Give it a name (e.g., <code>my-new-paper</code>). Keep it private if needed. Click <strong>Create repository</strong>. GitHub will show you a SSH link like <code>git@github.com:username/my-new-project.git</code>. Copy it.</li>
+<li>To link it to your local project folder:
+<ul>
+<li><p>On the terminal:</p>
+<pre class="shell"><code># Link to remote repo (SSH URL from GitHub)
+&gt; git remote add origin git@github.com:username/my-new-project.git
+# Push and set the upstream branch in one step
+&gt; git push -u origin master</code></pre></li>
+<li><p>On VSCode: After a commit, just use the <em>Publish Branch</em> option that appears under CHANGES.</p></li>
+</ul></li>
+</ul></li>
+<li><strong>Your co-author already has a repo.</strong> If your co-author already has a repo on GitHub, you can get a local copy by cloning it. This downloads the entire project, including its full Git history. Have him/her share his SSH link with you. Then clone using:
+<ul>
+<li>On the terminal: <code>git clone git@github.com:coauthor/his-project.git</code></li>
+<li>In VSCode: when opening a new window, you have a <em>Clone Git repository</em> option, then insert the SSH link.</li>
+</ul></li>
+</ol>
+<section id="the-basic-shared-workflow" class="level3">
+<h3 class="anchored" data-anchor-id="the-basic-shared-workflow">3.1 The basic shared workflow</h3>
+<p>When working on the same repository, there are two more commands to know:</p>
+<ul>
+<li><code>git pull</code> retrieves the latest changes (the commits of your co-authors). Doing this regularly (at the beginning of each work session or at least before every of YOUR commit) allows to keep your code updated and avoid future conflicts.</li>
+<li><code>git push</code> sends your commit to the online history on GitHub, making your changes available for the others. The key rule is to always <strong>pull before you push</strong>. This avoids most problems.</li>
+<li>On VSCode, there are two options <code>push</code> and <code>pull</code> next to the GRAPH section in the Version Control Panel.</li>
+</ul>
+</section>
+<section id="resolving-merge-conflicts" class="level3">
+<h3 class="anchored" data-anchor-id="resolving-merge-conflicts">3.2 Resolving merge conflicts</h3>
+<p>A merge conflict happens when two people edit the same lines in the same file. Git can’t automatically decide which version to keep, so it asks you to decide.</p>
+</section>
+</section>
+<section id="solo-workflow" class="level2">
+<h2 class="anchored" data-anchor-id="solo-workflow">4. Solo workflow</h2>
+<p>This is the workflow I tend to use.</p>
+<ol type="1">
+<li><p>In my local project folder, I initialize git and create a <code>.gitignore</code> file. Here is the <code>.gitignore</code> file I usually start with:</p>
+<pre><code>literature/
+data/
+.claude/</code></pre></li>
+<li><p>I create a repo on GitHub. This allows me to access my code from anywhere, even if I’m not on my work laptop, as well as sharing it with others.</p>
+<p>Go to GitHub and click <strong>New repository</strong>. Give it a name (e.g., <code>my-new-paper</code>). Keep it private if needed. Click <strong>Create repository</strong>.</p>
+<p>GitHub will show you a SSH link like <code>git@github.com:username/my-new-project.git</code>. Copy it and link it to your project folder.</p></li>
+</ol>
+<p>The code:</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> init</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a .gitignore file</span></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Make your first commit</span></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> add .gitignore</span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> commit <span class="at">-m</span> <span class="st">"Initialized repo"</span></span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Link to remote repo (SSH URL from GitHub)</span></span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> remote add origin git@github.com:username/my-new-project.git</span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Push and set the upstream branch in one step</span></span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> push <span class="at">-u</span> origin master</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="danger-zone" class="level2">
+<h2 class="anchored" data-anchor-id="danger-zone">Danger Zone</h2>
+<div class="danger-zone">
+<p>There is one thing that is dangerous when using Git and/or Github: confidentiality. Everything you ever commit is tracked (that’s the whole point). Obviously you should not commit confidential data if you plan on making the repository accessible to other people. But more pervasively, when using APIs (to access a data service, to your favorite LLM, etc.) <strong>be careful about not writing your API key (or any credentials) in your code</strong> or any file that gets tracked. Otherwise it will be open for everyone to see. Bots have already specialized in tracking Github’s repositories for API keys.</p>
+<p>It is complicated and not guaranteed that you can remove a file or an information entirely from your git history. For a method, see <a href="https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/removing-sensitive-data-from-a-repository">this guide</a>.</p>
+</div>
+</section>
+<section id="faq" class="level2">
+<h2 class="anchored" data-anchor-id="faq">FAQ</h2>
+<details class="faq-item">
+<summary>
+How to stop tracking a file?
+</summary>
+<p>By default, if you started tracking a file, it will be in the Git history. If at some point you want to stop tracking it but not delete it locally, you can run:</p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> rm <span class="at">--cached</span> path/to/file.do</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<blockquote class="blockquote">
+<p><strong>Note:</strong> This only stops tracking the file going forward. It does not erase the file from your history.</p>
+</blockquote>
+</details>
+<details class="faq-item">
+<summary>
+How do I track only some files inside an ignored folder?
+</summary>
+<p>Use <code>data/*</code> (ignore everything inside <code>data/</code>) combined with <code>!</code> to un-ignore specific files:</p>
+<pre><code>data/*
+!data/data1.csv</code></pre>
+<p>This reads: ignore all files under <code>data/</code>, except <code>data1.csv</code>. Note that you cannot write <code>data/</code> followed by <code>!data/data1.csv</code> — once Git ignores an entire directory it stops looking inside it, so the <code>!</code> rule never fires.</p>
+</details>
+<details class="faq-item">
+<summary>
+I have uncommitted changes and need to switch branches (or pull) — what do I do?
+</summary>
+<p>Git won’t let you switch branches if you have unsaved changes that would be overwritten. Use <code>git stash</code> to temporarily shelve your work:</p>
+<div class="sourceCode" id="cb19"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> stash           <span class="co"># shelve current changes</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> checkout main   <span class="co"># switch branches freely</span></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> stash pop       <span class="co"># restore your changes when you're back</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><code>git stash pop</code> re-applies the most recent stash and removes it from the stash list. If you run <code>git stash</code> multiple times, use <code>git stash list</code> to see all stashed states.</p>
+</details>
+</section>
+<section id="quick-code-reference" class="level2">
+<h2 class="anchored" data-anchor-id="quick-code-reference">Quick code reference</h2>
+<table class="table">
+<thead>
+<tr class="header">
+<th>Command</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>git init</code></td>
+<td>Start tracking a project</td>
+</tr>
+<tr class="even">
+<td><code>git status</code></td>
+<td>See what changed</td>
+</tr>
+<tr class="odd">
+<td><code>git add .</code></td>
+<td>Stage all changes</td>
+</tr>
+<tr class="even">
+<td><code>git commit -m "msg"</code></td>
+<td>Save a snapshot</td>
+</tr>
+<tr class="odd">
+<td><code>git push</code></td>
+<td>Upload to GitHub</td>
+</tr>
+<tr class="even">
+<td><code>git pull</code></td>
+<td>Download from GitHub</td>
+</tr>
+<tr class="odd">
+<td><code>git clone &lt;url&gt;</code></td>
+<td>Copy a remote repo locally</td>
+</tr>
+<tr class="even">
+<td><code>git branch &lt;name&gt;</code></td>
+<td>Create a branch</td>
+</tr>
+<tr class="odd">
+<td><code>git checkout &lt;name&gt;</code></td>
+<td>Switch to a branch</td>
+</tr>
+<tr class="even">
+<td><code>git merge &lt;name&gt;</code></td>
+<td>Merge a branch into current</td>
+</tr>
+<tr class="odd">
+<td><code>git log</code></td>
+<td>View commit history</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="references" class="level2">
+<h2 class="anchored" data-anchor-id="references">References</h2>
+<ul>
+<li>Lino Galiana’s tutorial on how to use Git and R (in French) <a href="https://inseefrlab.github.io/formation-bonnes-pratiques-git-R/">here</a></li>
+<li>Michael Topper and Danny Klinenberg’s class “Data Wrangling for Economists” at UCSB <a href="https://michaeltopper1.github.io/data-wrangling-econ-book/git-and-github.html">here</a></li>
+<li>Jesús Fernández-Villaverde’s note on Git <a href="https://www.sas.upenn.edu/~jesusfv/Chapter_HPC_5_Git.pdf">here</a></li>
+<li>VSCode official introduction video to using Git in VSCode <a href="https://www.youtube.com/watch?v=i_23KUAEtUM">here</a></li>
+</ul>
+
+
+</section>
+
+<a onclick="window.scrollTo(0, 0); return false;" role="button" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+      &nbsp;
+    </div>   
+    <div class="nav-footer-center">
+<p>Axel Verrier · <a href="mailto:axel.verrier@mineparis.psl.eu">axel.verrier@mineparis.psl.eu</a> · Content licensed under CC BY 4.0</p>
+</div>
+    <div class="nav-footer-right">
+      &nbsp;
+    </div>
+  </div>
+</footer>
+
+
+
+
+</body></html>

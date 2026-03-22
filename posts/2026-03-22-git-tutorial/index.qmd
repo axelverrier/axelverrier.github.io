@@ -1,0 +1,462 @@
+---
+title: "An introduction to git for applied economics"
+description: "A practical introduction to Git and GitHub for researchers, covering version control basics, branches, and collaboration."
+date: 2026-03-22
+toc: true
+toc-location: left
+toc-depth: 3
+---
+
+## What is Git?
+
+Git is a version control tool. It tracks changes to your files over time. Every time you save a snapshot, Git records what changed, when, and why. You can go back to any previous snapshot at any point.
+
+
+## Why use Git?
+
+Git helps coding in a much cleaner way. While doing analysis, you often change your code, rearrange parts, test new things. It's easy to get confused and end up with both complicated and meaningless filenames `analysis_part1_v3.py`. It is also incredibly hard to go back in time to see your code, `ctrl+Z` can only do so much. Using Git avoids that. Think of it as checkpoints. At any time, you can go back to one of the previous version of your code, and then compare between the two or start again in a different direction.
+
+**Git vs. GitHub**
+
+It's easy to get confused between the two, but Git and GitHub are two different things.
+
+- **Git** is a tool that runs locally on your computer. It's the one doing the version tracking.
+- **GitHub** is a website that you can use to store your files and your Git history in the cloud. It's a way to backup and share your code with others.
+
+## 1. Installing Git
+
+Go to [https://git-scm.com](https://git-scm.com) and download Git for your operating system. Installation steps are explained [here](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git). Once this is done, you'll need to create a username. This is how Git knows *who* made changes. The easiest way is to use the terminal.
+
+```console
+$ git config --global user.name "John Doe"
+$ git config --global user.email johndoe@example.com
+```
+
+
+### 1.1 Terminal or VSCode
+
+Git is a command-line tool, which you use from the terminal. However, most IDEs (RStudio, VSCode) detect Git automatically once it is installed and let you use it through a graphical interface. To my knowledge, Stata does not have an integration of Git, which means you'll have to use the command line in that case.
+
+
+## 2. Using Git
+
+### 2.1 Initializing a repository
+
+A repository (or "repo") is your project folder being tracked by Git. When you initialize a repository, Git creates a hidden `.git` folder inside it. This is where all your history, snapshots, and configuration live. You never need to touch `.git` directly.
+To initialize git in a folder: 
+
+::: {.panel-tabset}
+## Terminal
+
+Navigate to your project's folder, open a terminal and run `git init`.
+
+## VSCode
+
+Open the Source control panel on the left, and hit *Initialize repository*.
+:::
+
+::: {.callout-tip}
+## What should be tracked?
+
+Not all files deserve to be tracked. Some files never change (your original data), some you don't need to track changes (your temporary data for some side analysis, your logs). I suggest using version control mainly for your scripts, and depending on how you use it, your results/output.
+
+Git has developed a special file to specify all that should never be tracked: `.gitignore` (it's literally the name of the file, nothing before the dot). You put it in your project root and list files or folders to ignore. Git will then pretend those files don't exist. This is what it looks like:
+
+```
+# ignore the data directory and its subfolders and files
+data/
+
+# ignore all the dta files
+*.dta
+```
+
+The `.gitignore` file is essential for keeping data files and other temporary files untracked and keeping your workflow clean.
+:::
+
+### 2.2 The stages of Git
+
+This is the most important part for understanding Git. To perform version controls, Git implicitly assigns your files to different status.
+
+By default, all files are **untracked**. This means Git does not keep track of their versions in its history. To start tracking files, you need to **commit** them a first time. Committing is just like saving a file, it means that Git keeps a snapshot of the file at this time in its history. If you change a file that has been committed, it will be marked as **modified**: Git knows the file, but it has changed since the last commit.
+
+A final state is **staged**. Staging a file means you've marked the file to be included in the next commit but you have not yet committed. This is useful when you only want to commit (=take a snapshot of) some files while keep working on others and not commit them right away. Git will only commit your staged files.
+
+At any time, you see the status of your files.
+
+::: {.panel-tabset}
+## Terminal
+
+Let's use an example:
+
+```bash
+# create a new folder and navigate into it
+> mkdir newproject
+> cd newproject
+
+# initializes the repo
+> git init
+Initialized empty Git repository in path/to/project/.git/
+
+# create an example do-file
+> echo "use data/mydata.dta, clear" > load_data.do
+
+# this command stages the file. If you want to stage all files, you can type `git add .`
+> git add load_data.do
+
+# Commit your staged files. The "-m" flag lets you add a message (mandatory).
+# Git then returns a summary of what has changed
+> git commit -m "Initialized repo and load_data"
+[master (root-commit) e4bce04] Initialized repo and load_data
+ 1 file changed, 1 insertion(+)
+ create mode 100644 load_data.do
+
+# Let's say you change your file again
+> echo "use data2/mydata2.dta, clear" > load_data.do
+
+# check the status of your files
+> git status
+On branch master
+Changes not staged for commit:
+        modified:   load_data.do
+```
+
+## VSCode
+
+Once your repo is initialized, check out the Source Control panel.
+
+The **CHANGES** section acts like a continuous `git status`. As soon as you modify and save a file, its status will change accordingly. Files and directories specified in `.gitignore` will not appear in this panel.
+
+The letters on the right of each file specify its status: U for Untracked, M for Modified (compared to the previous commit), A for Added when it is the first time you stage this file.
+
+- To stage a file, hover over its filename in the Source Control panel and hit the `+` button. The file will be moved from the *Changes* subsection to *Staged Changes*.
+- To commit, add a message and hit `Commit`. This will only commit your staged changes.
+- Once you commit, you can see a starting point in the **GRAPH** panel below with your comment. This is your history of commits.
+:::
+
+Finally, one last state/action, reserved to using Git with GitHub, is to **push**. Pushing means uploading the changes online. Before pushing, your changes are saved locally, after, they are saved on GitHub. I explain working with GitHub later.
+
+::: {.callout-tip}
+## When to commit?
+
+It's always hard to know when to commit. You don't want to commit every little change because it is easy to get overwhelmed, but at the same time you don't want to wait too much before committing, otherwise it might be hard to get back to the intermediate state you want. I have 2 rules of thumb for committing.
+
+1. **Use one commit per change.** By change I mean a set of changes that go together. For example adding a new script to load the data, fixing a bug, modifying a function and how it is called in every script. 1 main modification, 1 comment, 1 commit. If you change three analyses and update your figures' titles and refactor how your code works together at the same time, and only commit once, it's super hard to understand what you did when you come back a month later.
+
+   Note: It doesn't mean that you have to work on one single task at the time, you can simply choose which files you put in your next commit (=stage).
+
+2. **Always commit working code.** I try to always commit code that is running without error, i.e. not half-finished or still-in-progress code. It's pretty useless to save half-finished code because if you come back 2 weeks later, you simply have no clue what you wanted to do and why it goes wrong.
+
+In the end, the worst rule you can adopt is committing everything at the end of every day/week (which was what I did at first). It's just messy.
+:::
+
+### 2.3 Inspecting your history
+
+::: {.panel-tabset}
+## Terminal
+
+To see your commit history, run:
+
+```bash
+# full history with hashes, author, date, message
+> git log
+commit e4bce0404cb210a623c82db39626fba1f9d85107 (HEAD -> master)
+Author: Axel Verrier <xxx@xxx.xxx>
+Date:   Fri Mar 20 11:45:33 2026 +0100
+
+    Initialized repo and load_data
+
+# compact one-line-per-commit view
+> git log --oneline
+e4bce04 (HEAD -> master) Initialized repo and load_data
+```
+
+Each commit has a unique hash (something that looks like `e4bce04`) to identify it. You can use it to navigate history.
+
+`(HEAD -> master)` tells you where you are. `master` is your current branch; `HEAD` is the pointer to your current position in history. The `->` means they're aligned. If you checkout an old commit to inspect it, HEAD detaches from the branch and that arrow disappears until you return. We will talk about branches later.
+
+Another command is `git diff`. It allows you to see line-by-line changes that are *not yet staged* (differences between your working directory and the staging area). To see changes you *have* staged, use `git diff --staged`.
+
+```bash
+# compare changes in a specific file
+> git diff load_data.do
+
+diff --git a/load_data.do b/load_data.do
+index 0dd93a8..a05e7b8 100644
+--- a/load_data.do
++++ b/load_data.do
+@@ -1 +1 @@
+-"use data/mydata.dta, clear"
++"use data/mydata2.dta, clear"
+
+# compare current file against an older commit: use the hash number
+> git diff e4bce04 load_data.do
+```
+
+**How to understand it:**
+
+```
+diff --git a/load_data.do b/load_data.do
+```
+This compares the names of the file, in case they changed.
+
+```
+index 0dd93a8..a05e7b8 100644
+```
+This part is useless, it's just Git metadata.
+
+```
+--- a/load_data.do
++++ b/load_data.do
+```
+This tells you which files have changed. Git doesn't track edits per se but deletions and insertions. An edit shows up as one `-` line and one `+` line. Here I replaced `use data/mydata.dta, clear` by `use data2/mydata2.dta, clear` so the first gets deleted and the second is added.
+
+```
+@@ -1 +1 @@
+```
+The header tells you where the changes are in the file. The format is `@@ -start,count +start,count @@`. Here: the change starts at line 1 of the old file (-1) and line 1 of the new file (+1). When the count is 1 it's omitted. In a larger file you'd see something like `@@ -45,6 +45,7 @@`, meaning "starting at line 45, showing 6 old lines / 7 new lines."
+
+```
+-"use data/mydata.dta, clear"
++"use data/mydata2.dta, clear"
+```
+The actual change. `-` (in red) = line removed, `+` (in green) = line added.
+
+## VSCode
+
+In VSCode, you can easily look at your commit history in the GRAPH panel. If you click on one of your commits, you will be able to see which files have been changed and how. You can inspect file differences line-by-line when clicking on a file.
+:::
+
+### 2.4 Reviewing a previous version
+
+To check out how your code was at a previous commit, you run a command called **checkout**. To check out a specific commit, you need its identifier (its hash).
+
+::: {.panel-tabset}
+## Terminal
+
+The command is `git checkout [hash]`:
+
+```shell
+# find the identifier for the commit you want to check
+> git log
+# Review past code using checkout
+> git checkout a3f9c12
+# return to current state of the code by using:
+> git checkout main
+```
+
+This allows you to temporarily review your files at the time of the commit. If you now look at your folder, its state is what it was at that time: the files added after this commit are gone, the ones that were deleted are back, and the changes are reverted. This is not permanent. Run `git checkout main` to return to the present.
+
+## VSCode
+
+On VSCode, you can find the hash by hovering your mouse over the commit you're interested in. Then right-click on your branch in GRAPH, and hit *Checkout (detached)*. If you now look at your explorer (inside VSCode), you'll see the state of your files at that time. To resume current work, click on the hash at the very bottom-left of the screen, it opens up the top command panel, and hit on the bottom branch, usually called master or main.
+:::
+
+### 2.5 Restoring a previous version of the code
+
+There are several ways of restoring an old version of the code.
+
+- **If you only want to cancel your last commit**, you can undo it safely by using `git revert a3f9c12`. This actually creates a new commit that reverses the changes of the specified commit.
+
+  On VSCode, hit the three dots "..." next to CHANGES, then *Commit* > *Undo Last Commit*.
+
+- If you want to go back and start again from a previous point in time, you do a `reset`. There are 2 types of reset:
+
+  - **Soft reset**. A soft reset will cancel all the commits after this one, but will keep changes staged, i.e. your code will stay the same as before the reset but the snapshot will be gone, and you have the opportunity to recommit. This is useful if you committed too early or want to consolidate several small commits into a big one.
+
+    `git reset --soft a3f9c12`
+
+  - **Hard reset**. A hard reset cancels all commits after the chosen one and discards all changes. Your code will return to its original state at that time.
+
+    `git reset --hard a3f9c12`
+
+Although there are several workarounds, I did not find a reset option in VSCode so the best is to do it from the terminal for this one.
+
+Those were the main ways of undoing things, but the most interesting thing about Git is its branches. Branches allow you to work on different versions of your code in parallel. This is the next part.
+
+### 2.6 Using branches
+
+A branch is a copy of your project. This allows you to work on several features at once, in parallel. For example, assume you're working on an optimization programme and want to implement new constraints, each of them requiring modifying multiple files: the actual code where you define the constraint, the main script where it will be called, the parameters it will be taking and maybe you need to adjust a couple other functions to make it all interact together nicely. You can develop each of these on a separate branch, so that you can work on them and test them independently and at the same time, without touching your main analysis. At the end, you can merge them altogether (and resolve potential arising conflicts).
+
+Think of it as a tree:
+
+- You have a trunk: it is the initial branch that is created when initializing git (usually called *main* or *master*).
+- At any given commit, you can create a node and grow one (or several) new branches that will share the same initial base. You can also grow a branch from another branch.
+- (Unlike a tree), you can merge back branches when you feel like it.
+
+::: {.panel-tabset}
+## Terminal
+
+To create a new branch, you can use the `branch` command.
+
+```bash
+# create a new branch from where you are now
+> git branch capacity_constraint
+> git checkout capacity_constraint    # switch to this new branch
+
+# or start from a specific past commit
+> git checkout -b capacity_constraint a3f9c12
+```
+
+> **Note:** Git requires your working directory to be up to date before you can switch branches. If you have uncommitted changes, either commit them first or use `git stash` to shelve them temporarily (see FAQ).
+
+Now make your changes. Add commits as usual. When you're satisfied, you can choose to merge a branch to your main branch. This will merge all the modifications.
+
+```bash
+> git checkout main                 # go back to main
+> git merge capacity_constraint     # bring in the changes
+> git branch -d capacity_constraint # delete the temporary branch: not useful anymore
+```
+
+## VSCode
+
+In VSCode, to create a new branch, go to **...** (next to CHANGES) > *Branch* > *Create branch*. If you want to create a new branch from a specific commit, right-click on the commit, then *Create branch*.
+:::
+
+Simple merges, where the two branches changed different files or different lines, happen automatically. But when two branches changed the same lines, you get a conflict and Git asks you to resolve it manually.
+
+## 3. Collaborating on GitHub
+
+When working with others, GitHub makes collaboration much cleaner than Dropbox or email.
+
+Two options:
+
+1. **You create the repo on GitHub**.
+   - If not already, create a local folder, initialize git and make a first commit (for eg add a `.gitignore` file).
+   - Then go to GitHub and click **New repository**. Give it a name (e.g., `my-new-paper`). Keep it private if needed. Click **Create repository**. GitHub will show you a SSH link like `git@github.com:username/my-new-project.git`. Copy it.
+   - To link it to your local project folder:
+     - On the terminal:
+       ```shell
+       # Link to remote repo (SSH URL from GitHub)
+       > git remote add origin git@github.com:username/my-new-project.git
+       # Push and set the upstream branch in one step
+       > git push -u origin master
+       ```
+     - On VSCode: After a commit, just use the *Publish Branch* option that appears under CHANGES.
+
+2. **Your co-author already has a repo.** If your co-author already has a repo on GitHub, you can get a local copy by cloning it. This downloads the entire project, including its full Git history. Have him/her share his SSH link with you. Then clone using:
+   - On the terminal: `git clone git@github.com:coauthor/his-project.git`
+   - In VSCode: when opening a new window, you have a *Clone Git repository* option, then insert the SSH link.
+
+### 3.1 The basic shared workflow
+
+When working on the same repository, there are two more commands to know:
+
+- `git pull` retrieves the latest changes (the commits of your co-authors). Doing this regularly (at the beginning of each work session or at least before every of YOUR commit) allows to keep your code updated and avoid future conflicts.
+- `git push` sends your commit to the online history on GitHub, making your changes available for the others. The key rule is to always **pull before you push**. This avoids most problems.
+- On VSCode, there are two options `push` and `pull` next to the GRAPH section in the Version Control Panel.
+
+### 3.2 Resolving merge conflicts
+
+A merge conflict happens when two people edit the same lines in the same file. Git can't automatically decide which version to keep, so it asks you to decide.
+
+## 4. Solo workflow
+
+This is the workflow I tend to use.
+
+1. In my local project folder, I initialize git and create a `.gitignore` file. Here is the `.gitignore` file I usually start with:
+
+   ```
+   literature/
+   data/
+   .claude/
+   ```
+
+2. I create a repo on GitHub. This allows me to access my code from anywhere, even if I'm not on my work laptop, as well as sharing it with others.
+
+   Go to GitHub and click **New repository**. Give it a name (e.g., `my-new-paper`). Keep it private if needed. Click **Create repository**.
+
+   GitHub will show you a SSH link like `git@github.com:username/my-new-project.git`. Copy it and link it to your project folder.
+
+The code:
+
+```bash
+git init
+
+# Create a .gitignore file
+
+# Make your first commit
+git add .gitignore
+git commit -m "Initialized repo"
+
+# Link to remote repo (SSH URL from GitHub)
+git remote add origin git@github.com:username/my-new-project.git
+
+# Push and set the upstream branch in one step
+git push -u origin master
+```
+
+## Danger Zone
+
+::: {.danger-zone}
+There is one thing that is dangerous when using Git and/or Github: confidentiality. Everything you ever commit is tracked (that's the whole point). Obviously you should not commit confidential data if you plan on making the repository accessible to other people. But more pervasively, when using APIs (to access a data service, to your favorite LLM, etc.) **be careful about not writing your API key (or any credentials) in your code** or any file that gets tracked. Otherwise it will be open for everyone to see. Bots have already specialized in tracking Github's repositories for API keys.
+
+It is complicated and not guaranteed that you can remove a file or an information entirely from your git history. For a method, see [this guide](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/removing-sensitive-data-from-a-repository).
+:::
+
+## FAQ
+
+<details class="faq-item">
+<summary>How to stop tracking a file?</summary>
+
+By default, if you started tracking a file, it will be in the Git history. If at some point you want to stop tracking it but not delete it locally, you can run:
+
+```bash
+git rm --cached path/to/file.do
+```
+
+> **Note:** This only stops tracking the file going forward. It does not erase the file from your history.
+
+</details>
+
+<details class="faq-item">
+<summary>How do I track only some files inside an ignored folder?</summary>
+
+Use `data/*` (ignore everything inside `data/`) combined with `!` to un-ignore specific files:
+
+```
+data/*
+!data/data1.csv
+```
+
+This reads: ignore all files under `data/`, except `data1.csv`. Note that you cannot write `data/` followed by `!data/data1.csv` — once Git ignores an entire directory it stops looking inside it, so the `!` rule never fires.
+
+</details>
+
+<details class="faq-item">
+<summary>I have uncommitted changes and need to switch branches (or pull) — what do I do?</summary>
+
+Git won't let you switch branches if you have unsaved changes that would be overwritten. Use `git stash` to temporarily shelve your work:
+
+```bash
+git stash           # shelve current changes
+git checkout main   # switch branches freely
+git stash pop       # restore your changes when you're back
+```
+
+`git stash pop` re-applies the most recent stash and removes it from the stash list. If you run `git stash` multiple times, use `git stash list` to see all stashed states.
+
+</details>
+
+
+## Quick code reference
+
+| Command               | What it does                |
+| --------------------- | --------------------------- |
+| `git init`            | Start tracking a project    |
+| `git status`          | See what changed            |
+| `git add .`           | Stage all changes           |
+| `git commit -m "msg"` | Save a snapshot             |
+| `git push`            | Upload to GitHub            |
+| `git pull`            | Download from GitHub        |
+| `git clone <url>`     | Copy a remote repo locally  |
+| `git branch <name>`   | Create a branch             |
+| `git checkout <name>` | Switch to a branch          |
+| `git merge <name>`    | Merge a branch into current |
+| `git log`             | View commit history         |
+
+## References
+
+- Lino Galiana's tutorial on how to use Git and R (in French) [here](https://inseefrlab.github.io/formation-bonnes-pratiques-git-R/)
+- Michael Topper and Danny Klinenberg's class "Data Wrangling for Economists" at UCSB [here](https://michaeltopper1.github.io/data-wrangling-econ-book/git-and-github.html)
+- Jesús Fernández-Villaverde's note on Git [here](https://www.sas.upenn.edu/~jesusfv/Chapter_HPC_5_Git.pdf)
+- VSCode official introduction video to using Git in VSCode [here](https://www.youtube.com/watch?v=i_23KUAEtUM)

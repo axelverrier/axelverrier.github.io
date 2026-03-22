@@ -1,0 +1,10 @@
+freeze: true
+
+format:
+  html:
+    code-fold: true
+    code-summary: "Show the code"
+    code-tools: true
+    toc: true
+    toc-location: left
+    number-depth: 2
