@@ -6,7 +6,6 @@ project:
   render:
     - "*.qmd"
     - "posts/**/*.qmd"
-    - "projects/**/*.qmd"
     - "!posts_raw/"
 
 website:
