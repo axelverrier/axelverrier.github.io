@@ -7,4 +7,9 @@ listing:
   sort: "date desc"
   filter-ui: false
   sort-ui: false
+  date-format: "MMM YYYY"
+  field-display-names:
+    date: ""
+    title: ""
+    description: ""
 ---

@@ -1,6 +1,5 @@
 /* Typography */
 h2, h3 {
-  font-family: "Georgia", "Times New Roman", serif;
   margin-top: 1.5rem;
   margin-bottom: 0.25rem;
 }
@@ -41,10 +40,17 @@ details p {
   color: #444;
 }
 
+/* Navbar separator before Side quests dropdown */
+.navbar-nav .nav-item.dropdown > .nav-link::before {
+  content: "|";
+  margin-right: 0.6rem;
+  opacity: 0.4;
+}
+
 /* Navbar brand styling */
 .navbar-brand {
-  font-family: "Georgia", serif;
-  font-weight: normal;
+  font-family: "Nunito Sans", sans-serif;
+  font-weight: 700;
   letter-spacing: 0.02em;
 }
 
@@ -98,6 +104,43 @@ details.faq-item p {
   padding: 0;
   font-size: 1rem;
   color: inherit;
+}
+
+/* Blog listing table */
+.quarto-listing-table thead {
+  display: none;
+}
+
+.quarto-listing-table td {
+  padding: 0.75rem 0.5rem;
+  vertical-align: top;
+  border-color: #f0ebe3;
+}
+
+.listing-date {
+  color: #999;
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+
+.listing-title a {
+  color: #222;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.listing-title a:hover {
+  color: #7a6a55;
+  text-decoration: none;
+}
+
+.listing-description {
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.quarto-listing-table tr:hover {
+  background-color: #faf7f2;
 }
 
 /* General content max width on full-layout pages */
