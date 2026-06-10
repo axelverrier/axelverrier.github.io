@@ -6,3 +6,6 @@
 posts_raw/
 CLAUDE.md
 *.Rproj
+
+**/*.quarto_ipynb
+_freeze
